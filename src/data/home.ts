@@ -3,7 +3,7 @@ export type DayState = 'planned' | 'rest' | 'done'
 /** Временные данные Главной — совпадают с референсом. */
 export const homeMock = {
   muscle: 'Грудь',
-  coach: { title: 'Выбор', subtitle: 'По восстановлению и вашей анкете' },
+  coach: { title: 'Выбор тренера', subtitle: 'По восстановлению и вашей анкете' },
   week: [
     { label: 'Пн', state: 'planned' },
     { label: 'Вт', state: 'rest' },
