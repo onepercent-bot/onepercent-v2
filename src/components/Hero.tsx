@@ -1,12 +1,16 @@
 import { ChevronDownIcon, GearIcon, SparkIcon } from './Icons'
 import heroImg from '../assets/hero-character.webp'
+import chestImg from '../assets/muscles/chest.webp'
 
 type Props = { muscle: string; title: string; subtitle: string }
 
 export function Hero({ muscle, title, subtitle }: Props) {
   return (
     <section className="hero" aria-label="Тренировка на сегодня">
-      <img className="hero__figure" src={heroImg} alt="" width={302} height={452} draggable={false} />
+      <div className="hero__figure">
+        <img src={heroImg} alt="" width={302} height={452} draggable={false} />
+        <img className="hero__muscle-layer" src={chestImg} alt="" width={302} height={452} draggable={false} />
+      </div>
 
       <span className="hero__today">Сегодня</span>
       <button type="button" className="hero__muscle tappable">

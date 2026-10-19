@@ -118,6 +118,15 @@ img {
   mask-image: linear-gradient(180deg, #000 52%, transparent 66%);
   pointer-events: none;
 }
+.hero__figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.hero__muscle-layer {
+  position: absolute;
+  inset: 0;
+}
 
 .hero__today {
   position: absolute;
