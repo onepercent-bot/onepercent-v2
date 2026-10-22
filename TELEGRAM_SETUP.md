@@ -1,17 +1,12 @@
-# Telegram setup (факты из onepercent-app, 2026-10-21)
+# Telegram setup One% (актуально на 2026-10-22)
 
-- Бот: @onepercentfit_bot, Python + aiogram 3, режим polling (поэтому getUpdates даёт 409).
-- Репозиторий бота: onepercent-bot/onepercent-app, запуск: `bot.py` (Procfile: `worker: python bot.py`).
-- Хостинг бота: Railway, проект `imaginative-fascination`, сервис `worker`. Лишний проект `inspiring-analysis` падает, можно удалить.
-- BOT_TOKEN: только переменная окружения Railway (`BOT_TOKEN`), в git не хранится. Шаблон: `.env.example`.
-- WEBAPP_URL: переменная Railway; бот подставляет её в кнопку «Открыть one percent» (web_app) в reply-клавиатуре.
-- chat_id: бот его не хранит. Есть только `from_user.id` в обработчике сообщений. В личном чате chat_id = Telegram ID пользователя.
-- Mini App (старая версия, onepercent-app): https://onepercent-bot.github.io/onepercent-app/webapp/ (GitHub Pages, ветка main).
-- Deploy старой версии: push в main onepercent-app → Pages обновляется сам. Бот на Railway деплоится из того же репозитория.
-- onepercent-v2 deploy: `.github/workflows/pages.yml` (GitHub Pages, push в main или claude/home-screen, `base: './'`). Требует включить Pages: Settings → Pages → Source: GitHub Actions.
-- HTTPS URL для v2 (после включения Pages): https://onepercent-bot.github.io/onepercent-v2/ (не проверен).
-- Привязка бота к v2: поменять WEBAPP_URL в Railway (сервис `worker`) на этот URL и перезапустить сервис. Не сделано.
-- Secrets в этой среде: нет (ни BOT_TOKEN, ни Railway-токена, ни chat_id).
-- Отправка от бота: `https://api.telegram.org/bot<BOT_TOKEN>/sendMessage` (токен идёт в URL, не в Bearer-заголовок).
-- Токена в этой среде нет. Нужен BOT_TOKEN и chat_id, прежде чем отправлять сообщения отсюда.
-- Не читать onepercent-app в следующих задачах: всё нужное записано здесь.
+- Схема: onepercent-v2 (main) → GitHub → Netlify (автодеплой) → Telegram Mini App @onepercentfit_bot.
+- Production URL: https://dreamy-clafoutis-385996.netlify.app/ (бот уже открывает этот адрес).
+- Как обновить Mini App: push в main → Netlify собирает сам (`npm run build`, папка `dist`).
+- Если push в main заблокирован: pull request, пользователь нажимает Merge.
+- Бот: @onepercentfit_bot, код в старом репозитории onepercent-app (aiogram, polling), хостинг Railway, сервис `worker`.
+- Переменные бота (BOT_TOKEN, WEBAPP_URL) хранятся только в Railway. В git и в эту среду не попадают.
+- Сменить адрес Mini App: изменить WEBAPP_URL в Railway и перезапустить `worker` (делает пользователь).
+- chat_id бот не хранит; в личном чате он равен Telegram ID пользователя.
+- Секретов в среде Claude нет: нет доступа к боту, Railway и Netlify. Отправлять в Telegram отсюда нельзя.
+- Старые репозитории onepercent-app и onepercent-web в работе v2 не читать.
