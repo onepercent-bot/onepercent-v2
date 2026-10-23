@@ -1,5 +1,8 @@
-import { useState, type ReactNode } from 'react'
-import artImg from '../../assets/welcome-art.webp'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
+import benchImg from '../../assets/exercises/bench.webp'
+import squatImg from '../../assets/exercises/squat.webp'
+import deadliftImg from '../../assets/exercises/deadlift.webp'
+import curlImg from '../../assets/exercises/curl.webp'
 import {
   ArrowRightIcon,
   BodyIcon,
@@ -13,9 +16,9 @@ import {
   PullUpBarIcon,
   PulseIcon,
 } from '../../components/Icons'
-import { emptyProfile, type Goal, type Level, type Place, type Profile } from '../../onboarding'
+import { emptyProfile, type Goal, type Level, type Lift, type Place, type Profile } from '../../onboarding'
 
-const STEPS = 6
+const STEPS = 7
 
 const goals: { id: Goal; title: string; sub: string; icon: ReactNode }[] = [
   { id: 'muscle', title: 'Набрать мышечную массу', sub: 'Больше мышц и объёма', icon: <DumbbellIcon className="ob-i-dumbbell" /> },
@@ -44,6 +47,17 @@ const muscles = ['Грудь', 'Спина', 'Плечи', 'Руки', 'Прес
 const NO_PRIORITY = 'Без приоритета'
 const limitList = ['Спина / поясница', 'Колени', 'Плечи', 'Локти', 'Запястья', 'Шея']
 const NO_LIMITS = 'Нет ограничений'
+
+const lifts: { id: Lift; title: string; img: string; start: number }[] = [
+  { id: 'bench', title: 'Жим лёжа', img: benchImg, start: 40 },
+  { id: 'squat', title: 'Присед', img: squatImg, start: 50 },
+  { id: 'deadlift', title: 'Становая тяга', img: deadliftImg, start: 60 },
+  { id: 'curl', title: 'Сгибание на бицепс', img: curlImg, start: 15 },
+]
+
+/** Значения барабана: 0–300 кг с шагом 2,5. */
+const WEIGHTS = Array.from({ length: 121 }, (_, i) => i * 2.5)
+const fmtKg = (v: number) => String(v).replace('.', ',')
 
 const inRange = (v: string, min: number, max: number) => {
   const n = Number(v.replace(',', '.'))
@@ -76,7 +90,9 @@ export function Onboarding({ onExit, onDone }: Props) {
     4: p.place !== null,
     5: p.perWeek !== null && p.minutes !== null && (p.autoDays || p.days.length === p.perWeek),
     6: true,
+    7: lifts.every((l) => p.workingWeights[l.id] !== null || p.workingUnknown[l.id]),
   }
+  const kbOpen = useKeyboardFit()
 
   const back = () => (step === 1 ? onExit() : setStep(step - 1))
   const next = () => {
@@ -86,7 +102,7 @@ export function Onboarding({ onExit, onDone }: Props) {
   }
 
   return (
-    <main className="ob">
+    <main className={`ob${kbOpen ? ' kb-open' : ''}`}>
       <div className="ob__top">
         <button type="button" className="ob__back tappable" aria-label="Назад" onClick={back}>
           <ChevronLeftIcon />
@@ -108,6 +124,7 @@ export function Onboarding({ onExit, onDone }: Props) {
         {step === 4 && <StepPlace p={p} set={set} />}
         {step === 5 && <StepSchedule p={p} set={set} />}
         {step === 6 && <StepPriority p={p} set={set} />}
+        {step === 7 && <StepWeights p={p} set={set} />}
       </div>
 
       <div className="ob__bottom">
@@ -117,7 +134,7 @@ export function Onboarding({ onExit, onDone }: Props) {
           </p>
         )}
         <button type="button" className="ob__cta tappable" disabled={!valid[step]} onClick={next}>
-          {step === STEPS ? 'Составить мой план' : 'Далее'}
+          Далее
           <ArrowRightIcon />
         </button>
       </div>
@@ -188,11 +205,11 @@ function StepAbout({ p, set }: StepProps) {
             <button
               key={g}
               type="button"
-              className={`ob-card ob-g ob-g--${g}${p.gender === g ? ' sel' : ''}${p.gender && p.gender !== g ? ' dim' : ''}`}
+              className={`ob-card ob-g${p.gender === g ? ' sel' : ''}`}
               aria-pressed={p.gender === g}
               onClick={() => set('gender', g)}
             >
-              <img src={artImg} alt="" draggable={false} />
+              <span className="ob-g__sym">{g === 'male' ? <MaleIcon /> : <FemaleIcon />}</span>
               <span className="ob-g__name">{g === 'male' ? 'Мужчина' : 'Женщина'}</span>
               <span className="ob-radio" />
             </button>
@@ -417,4 +434,196 @@ function StepPriority({ p, set }: StepProps) {
       </div>
     </>
   )
+}
+
+const MaleIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <circle cx="9.5" cy="14.5" r="6" />
+    <path d="M13.8 10.2 20 4M14.5 4H20v5.5" />
+  </svg>
+)
+
+const FemaleIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <circle cx="12" cy="8.5" r="6" />
+    <path d="M12 14.5V22M8.5 18.5h7" />
+  </svg>
+)
+
+function StepWeights({ p, set }: StepProps) {
+  const [picking, setPicking] = useState<Lift | null>(null)
+  const current = lifts.find((l) => l.id === picking)
+
+  return (
+    <>
+      <Head title="Твои рабочие веса" lead="Эти веса помогут AI составить тренировки под твой уровень." />
+      <div className="ob__body">
+        {lifts.map((l) => {
+          const value = p.workingWeights[l.id]
+          const unknown = p.workingUnknown[l.id]
+          return (
+            <div key={l.id} className="ob-card ob-lift">
+              <img className="ob-lift__img" src={l.img} alt="" draggable={false} />
+              <div className="ob-lift__main">
+                <span className="ob-lift__title">{l.title}</span>
+                <div className="ob-lift__row">
+                  <button type="button" className={`ob-lift__field${value !== null ? ' has' : ''}`} onClick={() => setPicking(l.id)} aria-label={`${l.title}: рабочий вес`}>
+                    <span>{value !== null ? fmtKg(value) : '—'}</span>
+                    <span className="ob-lift__unit">кг</span>
+                  </button>
+                  <button
+                    type="button"
+                    className={`ob-lift__unknown${unknown ? ' sel' : ''}`}
+                    aria-pressed={unknown}
+                    onClick={() => {
+                      set('workingUnknown', { ...p.workingUnknown, [l.id]: !unknown })
+                      set('workingWeights', { ...p.workingWeights, [l.id]: null })
+                    }}
+                  >
+                    Не знаю
+                  </button>
+                </div>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+      {current && (
+        <WeightSheet
+          title={current.title}
+          initial={p.workingWeights[current.id] ?? current.start}
+          onClose={() => setPicking(null)}
+          onDone={(v) => {
+            set('workingWeights', { ...p.workingWeights, [current.id]: v })
+            set('workingUnknown', { ...p.workingUnknown, [current.id]: false })
+            setPicking(null)
+          }}
+        />
+      )}
+    </>
+  )
+}
+
+const ITEM_H = 48
+
+/** Нижняя шторка с барабаном веса (шаг 2,5 кг). */
+function WeightSheet({ title, initial, onClose, onDone }: { title: string; initial: number; onClose: () => void; onDone: (v: number) => void }) {
+  const listRef = useRef<HTMLDivElement>(null)
+  const [index, setIndex] = useState(() => Math.max(0, WEIGHTS.indexOf(initial)))
+  const [shown, setShown] = useState(false)
+
+  const itemH = () => (listRef.current?.firstElementChild?.nextElementSibling as HTMLElement | null)?.offsetHeight || ITEM_H
+
+  useEffect(() => {
+    const el = listRef.current
+    if (el) el.scrollTop = index * itemH()
+    const id = requestAnimationFrame(() => setShown(true))
+    return () => cancelAnimationFrame(id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const onScroll = () => {
+    const el = listRef.current
+    if (!el) return
+    const i = Math.round(el.scrollTop / itemH())
+    setIndex(Math.min(WEIGHTS.length - 1, Math.max(0, i)))
+  }
+
+  const pick = (i: number) => listRef.current?.scrollTo({ top: i * itemH(), behavior: 'smooth' })
+
+  return (
+    <div className={`ob-sheet${shown ? ' is-shown' : ''}`} role="dialog" aria-modal="true" aria-label={title}>
+      <button type="button" className="ob-sheet__scrim" aria-label="Закрыть" onClick={onClose} />
+      <div className="ob-sheet__panel">
+        <span className="ob-sheet__grab" />
+        <h2 className="ob-sheet__title">{title}</h2>
+        <div className="ob-wheel">
+          <div className="ob-wheel__sel" aria-hidden>
+            <span className="ob-wheel__unit">кг</span>
+          </div>
+          <div className="ob-wheel__list" ref={listRef} onScroll={onScroll}>
+            <div className="ob-wheel__pad" />
+            {WEIGHTS.map((w, i) => {
+              const d = Math.abs(i - index)
+              return (
+                <button key={w} type="button" className={`ob-wheel__item d${Math.min(d, 4)}`} onClick={() => pick(i)} tabIndex={-1}>
+                  {fmtKg(w)}
+                </button>
+              )
+            })}
+            <div className="ob-wheel__pad" />
+          </div>
+        </div>
+        <button type="button" className="ob__cta ob-sheet__done tappable" onClick={() => onDone(WEIGHTS[index])}>
+          Готово
+        </button>
+      </div>
+    </div>
+  )
+}
+
+/**
+ * Держит активное поле над клавиатурой iOS в Telegram Mini App.
+ * Клавиатура уменьшает visualViewport: добавляем снизу отступ ровно на её высоту
+ * и прокручиваем поле в видимую область. Возвращает, открыта ли клавиатура.
+ */
+function useKeyboardFit() {
+  const [open, setOpen] = useState(false)
+
+  useEffect(() => {
+    const vv = window.visualViewport
+    const root = document.documentElement
+    let blurTimer = 0
+
+    const focused = () => {
+      const el = document.activeElement as HTMLElement | null
+      return el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') && el.closest('.ob') ? el : null
+    }
+    const reveal = () => {
+      const el = focused()
+      if (!el) return
+      const card = (el.closest('.ob-card') as HTMLElement | null) ?? el
+      card.scrollIntoView({ block: 'center', behavior: 'smooth' })
+    }
+    const update = () => {
+      const kb = vv ? Math.max(0, window.innerHeight - vv.height - vv.offsetTop) : 0
+      root.style.setProperty('--kb', `${Math.round(kb)}px`)
+      if (focused()) requestAnimationFrame(reveal)
+    }
+    const onFocusIn = (e: FocusEvent) => {
+      const t = e.target as HTMLElement
+      if (!(t.tagName === 'INPUT' || t.tagName === 'TEXTAREA') || !t.closest('.ob')) return
+      clearTimeout(blurTimer)
+      setOpen(true)
+      // клавиатура появляется с анимацией — проверяем после её завершения
+      setTimeout(reveal, 60)
+      setTimeout(update, 350)
+    }
+    const onFocusOut = () => {
+      blurTimer = window.setTimeout(() => {
+        if (!focused()) {
+          setOpen(false)
+          root.style.setProperty('--kb', '0px')
+          window.scrollTo(0, 0)
+        }
+      }, 120)
+    }
+
+    vv?.addEventListener('resize', update)
+    vv?.addEventListener('scroll', update)
+    window.addEventListener('resize', update)
+    document.addEventListener('focusin', onFocusIn)
+    document.addEventListener('focusout', onFocusOut)
+    return () => {
+      clearTimeout(blurTimer)
+      vv?.removeEventListener('resize', update)
+      vv?.removeEventListener('scroll', update)
+      window.removeEventListener('resize', update)
+      document.removeEventListener('focusin', onFocusIn)
+      document.removeEventListener('focusout', onFocusOut)
+      root.style.setProperty('--kb', '0px')
+    }
+  }, [])
+
+  return open
 }

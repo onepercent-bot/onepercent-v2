@@ -5,6 +5,7 @@ export type Gender = 'male' | 'female'
 export type Goal = 'muscle' | 'fat_loss' | 'strength' | 'definition' | 'maintain'
 export type Level = 'beginner' | 'intermediate' | 'advanced'
 export type Place = 'gym' | 'home_equipment' | 'home_bodyweight' | 'outdoor'
+export type Lift = 'bench' | 'squat' | 'deadlift' | 'curl'
 
 /** Ответы анкеты — на их основе строится персональная программа. */
 export type Profile = {
@@ -26,6 +27,10 @@ export type Profile = {
   priorities: string[]
   limits: string[]
   notes: string
+  /** Рабочие веса (кг, на 8–12 повторений) — стартовые веса для персональных тренировок. null — не указан. */
+  workingWeights: Record<Lift, number | null>
+  /** Пользователь нажал «Не знаю» для упражнения. */
+  workingUnknown: Record<Lift, boolean>
 }
 
 export const emptyProfile: Profile = {
@@ -47,6 +52,8 @@ export const emptyProfile: Profile = {
   priorities: [],
   limits: [],
   notes: '',
+  workingWeights: { bench: null, squat: null, deadlift: null, curl: null },
+  workingUnknown: { bench: false, squat: false, deadlift: false, curl: false },
 }
 
 /** Прошёл ли пользователь onboarding. Пока хранится на устройстве; позже — из API. */
