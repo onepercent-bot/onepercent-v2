@@ -7,7 +7,7 @@ type TgWebApp = {
   disableVerticalSwipes?(): void
 }
 
-const BG = '#0b1016'
+const BG = '#010509'
 
 /** Безопасно инициализирует Telegram WebApp; вне Telegram ничего не делает. */
 export function initTelegram() {

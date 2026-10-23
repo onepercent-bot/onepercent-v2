@@ -1,9 +1,9 @@
-import { BarsIcon, DumbbellIcon, HomeIcon, UserIcon } from './Icons'
+import { BarsIcon, ExercisesIcon, HomeIcon, UserIcon } from './Icons'
 
 const items = [
   { id: 'home', label: 'Главная', Icon: HomeIcon },
-  { id: 'exercises', label: 'Упражнения', Icon: DumbbellIcon },
-  { id: 'progress', label: 'Прогресс', Icon: BarsIcon },
+  { id: 'exercises', label: 'Упражнения', Icon: ExercisesIcon },
+  { id: 'analytics', label: 'Аналитика', Icon: BarsIcon },
   { id: 'profile', label: 'Профиль', Icon: UserIcon },
 ] as const
 
@@ -17,7 +17,7 @@ export function BottomNav({ active }: { active: (typeof items)[number]['id'] }) 
           className={`nav__item tappable${id === active ? ' is-active' : ''}`}
           aria-current={id === active ? 'page' : undefined}
         >
-          <Icon width={26} height={26} />
+          <Icon />
           <span>{label}</span>
         </button>
       ))}

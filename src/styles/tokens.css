@@ -1,19 +1,15 @@
 :root {
-  --bg: #0b1016;
-  --surface: #161d27;
-  --surface-2: #212936;
-  --border: rgba(255, 255, 255, 0.09);
-  --text: #ece6d6;
-  --text-muted: #98a1b2;
-  --text-dim: #6f7888;
-  --accent: #b1bbc7;
-  --on-accent: #1b2029;
-  --ring: #aab3c2;
+  --bg: #010509;
+  --border: rgba(130, 175, 220, 0.13);
+  --text: #ffffff;
+  --accent: #8cc4fb;
+  --accent-soft: #8fc6f2;
+  --day-label: #84b1db;
+  --nav-active: #8ad8fb;
+  --nav-idle: #b3b4e2;
 
-  --radius-card: 16px;
-  --radius-row: 14px;
-  --gutter: 20px;
+  --radius-card: 15px;
 
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
-  --font: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Inter Variable', system-ui, sans-serif;
 }

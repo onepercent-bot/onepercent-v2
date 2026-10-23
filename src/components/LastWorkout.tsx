@@ -1,24 +1,45 @@
-import { ArrowRightIcon, DumbbellIcon } from './Icons'
-import legsImg from '../assets/legs-placeholder.jpg'
+import { useId, useState } from 'react'
+import { ChevronDownIcon, ClockIcon } from './Icons'
 
-type Props = { title: string; meta: string; when: string }
+type Exercise = { name: string; sets: number }
+type Props = { muscle: string; minutes: number; exercises: Exercise[] }
 
-export function LastWorkout({ title, meta, when }: Props) {
+const sum = (xs: Exercise[]) => xs.reduce((n, x) => n + x.sets, 0)
+
+export function LastWorkout({ muscle, minutes, exercises }: Props) {
+  const [open, setOpen] = useState(false)
+  const listId = useId()
   return (
-    <section className="card last" aria-label="Прошлая тренировка">
-      <header className="last__head">
-        <DumbbellIcon width={20} height={20} className="last__icon" />
-        <h2 className="card__title">Прошлая тренировка</h2>
-        <span className="last__when">{when}</span>
-      </header>
-      <button type="button" className="last__row tappable">
-        <img className="last__thumb" src={legsImg} alt="" width={73} height={58} draggable={false} />
-        <span className="last__text">
-          <span className="last__name">{title}</span>
-          <span className="last__meta">{meta}</span>
+    <section className={`card last${open ? ' is-open' : ''}`} aria-label="Прошлая тренировка">
+      <button
+        type="button"
+        className="last__row tappable"
+        aria-expanded={open}
+        aria-controls={listId}
+        onClick={() => setOpen((v) => !v)}
+      >
+        <span className="icon-disc last__icon">
+          <ClockIcon />
         </span>
-        <ArrowRightIcon className="last__go" width={22} height={22} />
+        <span className="last__text">
+          <span className="last__name">Прошлая тренировка</span>
+          <span className="last__meta">
+            {muscle} • {minutes} мин • {exercises.length} упражнений • {sum(exercises)} подходов
+          </span>
+        </span>
+        <ChevronDownIcon className="last__chev" />
       </button>
+      <div className="last__panel" id={listId}>
+        <ul className="last__list">
+          {exercises.map((e, i) => (
+            <li key={e.name} className="last__item">
+              <span className="last__num">{i + 1}</span>
+              <span className="last__ex">{e.name}</span>
+              <span className="last__sets">{e.sets} подх.</span>
+            </li>
+          ))}
+        </ul>
+      </div>
     </section>
   )
 }

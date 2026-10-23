@@ -1,0 +1,234 @@
+/* Welcome: размеры из референса (холст шириной 390), масштаб по ширине экрана.
+   --u = calc(var(--u) * 1) холста. Картинка с персонажами увеличивается (с сохранением пропорций),
+   чтобы на высоких экранах композиция занимала экран. */
+.welcome-screen {
+  --u: calc(min(100vw, 480px) / 390);
+  --pad-top: env(safe-area-inset-top, 0px);
+  --pad-bottom: calc(env(safe-area-inset-bottom, 0px) + calc(var(--u) * 28));
+  /* высота блока под картинкой в закрытом состоянии: карточка, кнопка, подпись */
+  --ui-h: calc(var(--u) * 248);
+  --art-h: clamp(calc(var(--u) * 404.9), 100dvh - var(--pad-top) - var(--pad-bottom) - var(--ui-h), calc(var(--u) * 494));
+  height: 100dvh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  /* если экран выше композиции — сверху продолжаем верхнюю строку фона */
+  background:
+    url('../assets/welcome-top.png') top center / calc(var(--art-h) * 941 / 977) 50% no-repeat,
+    #01070e;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', system-ui, sans-serif;
+}
+.welcome-screen::-webkit-scrollbar {
+  display: none;
+}
+
+.welcome {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: var(--pad-top) 0 var(--pad-bottom);
+}
+
+.welcome__art {
+  position: relative;
+  flex: none;
+  height: var(--art-h);
+  overflow: hidden;
+  pointer-events: none;
+}
+.welcome__art img {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  height: 100%;
+  width: auto;
+  max-width: none;
+  transform: translateX(-50%);
+}
+
+.welcome__lead {
+  position: relative;
+  margin-top: calc(var(--u) * -42.9);
+  text-align: center;
+  font-size: calc(var(--u) * 14.3);
+  line-height: calc(var(--u) * 17.4);
+  font-weight: 400;
+  color: #fff;
+}
+
+.welcome__card {
+  position: relative;
+  align-self: center;
+  margin-top: calc(var(--u) * 8.5);
+  width: calc(var(--u) * 341.1);
+  border: calc(var(--u) * 0.6) solid rgba(120, 165, 210, 0.42);
+  border-radius: calc(var(--u) * 12);
+  background: linear-gradient(180deg, #051422 0%, #03101c 60%, #020d18 100%);
+  box-shadow: inset 0 calc(var(--u) * 1) 0 rgba(170, 210, 250, 0.06);
+}
+
+.welcome__item {
+  position: relative;
+}
+.welcome__item--2::before,
+.welcome__item--3::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: calc(var(--u) * 9.5);
+  right: calc(var(--u) * 10.8);
+  height: calc(var(--u) * 0.6);
+  background: rgba(120, 165, 210, 0.3);
+}
+
+.welcome__row {
+  position: relative;
+  display: block;
+  width: 100%;
+  text-align: left;
+}
+.welcome__item--1 .welcome__row {
+  height: calc(var(--u) * 54.3);
+}
+.welcome__item--2 .welcome__row {
+  height: calc(var(--u) * 53.1);
+}
+.welcome__item--3 .welcome__row {
+  height: calc(var(--u) * 56.3);
+}
+
+.welcome__icon {
+  position: absolute;
+  left: calc(var(--u) * 9.5);
+  top: 50%;
+  width: calc(var(--u) * 43.5);
+  height: calc(var(--u) * 39.4);
+  margin-top: calc(var(--u) * -19.7);
+  display: grid;
+  place-items: center;
+  border: calc(var(--u) * 0.6) solid rgba(130, 185, 240, 0.4);
+  border-radius: calc(var(--u) * 9);
+  background: linear-gradient(180deg, #15344f 0%, #0d2338 100%);
+  box-shadow: inset 0 0 calc(var(--u) * 6) rgba(120, 180, 240, 0.18);
+  color: #9fd2fb;
+}
+.welcome__item--1 .welcome__icon svg {
+  width: calc(var(--u) * 29);
+  height: calc(var(--u) * 17);
+}
+.welcome__item--2 .welcome__icon svg {
+  width: calc(var(--u) * 18);
+  height: calc(var(--u) * 27.4);
+}
+.welcome__item--3 .welcome__icon svg {
+  width: calc(var(--u) * 21.5);
+  height: calc(var(--u) * 21.5);
+}
+
+.welcome__text {
+  position: absolute;
+  left: calc(var(--u) * 74.2);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--u) * 4);
+}
+.welcome__title {
+  font-size: calc(var(--u) * 11.95);
+  line-height: calc(var(--u) * 15);
+  color: #fff;
+}
+.welcome__sub {
+  font-size: calc(var(--u) * 9.37);
+  line-height: calc(var(--u) * 12);
+  color: #74bff2;
+}
+
+.welcome__chev {
+  position: absolute;
+  right: calc(var(--u) * 13);
+  top: 50%;
+  width: calc(var(--u) * 24);
+  height: calc(var(--u) * 24);
+  margin-top: calc(var(--u) * -12);
+  stroke-width: 1.8;
+  color: #62a9f6;
+  transition: transform 320ms var(--ease-out);
+}
+.welcome__item.is-open .welcome__chev {
+  transform: rotate(90deg);
+}
+
+/* раскрывающийся текст */
+.welcome__panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 320ms var(--ease-out);
+}
+.welcome__item.is-open .welcome__panel {
+  grid-template-rows: 1fr;
+}
+.welcome__more {
+  min-height: 0;
+  overflow: hidden;
+  padding: 0 calc(var(--u) * 30) 0 calc(var(--u) * 74.2);
+  font-size: calc(var(--u) * 10.4);
+  line-height: calc(var(--u) * 15);
+  color: rgba(235, 241, 248, 0.78);
+  opacity: 0;
+  transition: opacity 200ms var(--ease-out), padding-bottom 320ms var(--ease-out);
+}
+.welcome__item.is-open .welcome__more {
+  padding-bottom: calc(var(--u) * 13);
+  opacity: 1;
+  transition: opacity 260ms var(--ease-out) 80ms, padding-bottom 320ms var(--ease-out);
+}
+
+.welcome__start {
+  position: relative;
+  align-self: center;
+  flex: none;
+  margin-top: calc(var(--u) * 11.2);
+  width: calc(var(--u) * 339);
+  height: calc(var(--u) * 47.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--u) * 8.5);
+  border: calc(var(--u) * 0.8) solid rgba(200, 228, 255, 0.75);
+  border-radius: calc(var(--u) * 999);
+  background:
+    linear-gradient(180deg, rgba(150, 195, 240, 0.22) 0%, rgba(150, 195, 240, 0) 40%, rgba(150, 195, 240, 0) 70%, rgba(150, 195, 240, 0.1) 100%),
+    linear-gradient(90deg, #a8d2fa 0%, #6ba4da 7%, #48759d 17%, #365a7c 29%, #335675 50%, #34597c 71%, #3a73af 86%, #4f9de9 95%, #64b2fd 100%);
+  box-shadow:
+    0 0 calc(var(--u) * 14) rgba(90, 165, 245, 0.45),
+    inset 0 0 calc(var(--u) * 8) rgba(190, 225, 255, 0.35);
+  color: #fff;
+  font-size: calc(var(--u) * 16.3);
+  font-weight: 400;
+}
+.welcome__start svg {
+  width: calc(var(--u) * 20);
+  height: calc(var(--u) * 20);
+  color: #8bc3f5;
+  stroke-width: 1.7;
+}
+
+.welcome__note {
+  margin-top: calc(var(--u) * 10.1);
+  text-align: center;
+  font-size: calc(var(--u) * 9.75);
+  line-height: calc(var(--u) * 12);
+  color: #6ab8ea;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .welcome__chev,
+  .welcome__panel,
+  .welcome__more {
+    transition: none !important;
+  }
+}
