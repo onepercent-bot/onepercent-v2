@@ -1,5 +1,5 @@
-const KEY = 'onepercent:onboarded'
-const PROFILE_KEY = 'onepercent:profile'
+const KEY = 'onepercent:onboarded:v2'
+const PROFILE_KEY = 'onepercent:profile:v2'
 
 export type Gender = 'male' | 'female'
 export type Goal = 'muscle' | 'fat_loss' | 'strength' | 'definition' | 'maintain'
