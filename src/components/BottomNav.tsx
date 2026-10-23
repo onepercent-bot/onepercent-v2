@@ -7,7 +7,9 @@ const items = [
   { id: 'profile', label: 'Профиль', Icon: UserIcon },
 ] as const
 
-export function BottomNav({ active }: { active: (typeof items)[number]['id'] }) {
+export type Tab = (typeof items)[number]['id']
+
+export function BottomNav({ active, onSelect }: { active: Tab; onSelect?: (tab: Tab) => void }) {
   return (
     <nav className="nav" aria-label="Основная навигация">
       {items.map(({ id, label, Icon }) => (
@@ -16,6 +18,7 @@ export function BottomNav({ active }: { active: (typeof items)[number]['id'] }) 
           type="button"
           className={`nav__item tappable${id === active ? ' is-active' : ''}`}
           aria-current={id === active ? 'page' : undefined}
+          onClick={() => onSelect?.(id)}
         >
           <Icon />
           <span>{label}</span>

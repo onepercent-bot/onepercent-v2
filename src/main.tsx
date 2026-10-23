@@ -5,6 +5,8 @@ import './styles/tokens.css'
 import './styles/base.css'
 import './styles/welcome.css'
 import './styles/onboarding.css'
+import './styles/wheel.css'
+import './styles/summit.css'
 import { initTelegram } from './telegram'
 import { App } from './App'
 

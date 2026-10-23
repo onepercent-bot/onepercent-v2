@@ -1,14 +1,14 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import benchImg from '../../assets/exercises/bench.webp'
 import squatImg from '../../assets/exercises/squat.webp'
 import deadliftImg from '../../assets/exercises/deadlift.webp'
-import curlImg from '../../assets/exercises/curl.webp'
 import {
   ArrowRightIcon,
   BodyIcon,
   BoltIcon,
   CheckIcon,
   ChevronLeftIcon,
+  ChevronRightIcon,
   DumbbellIcon,
   FlameIcon,
   GymIcon,
@@ -16,9 +16,10 @@ import {
   PullUpBarIcon,
   PulseIcon,
 } from '../../components/Icons'
+import { NumericWheelPicker } from '../../components/NumericWheelPicker'
 import { emptyProfile, type Goal, type Level, type Lift, type Place, type Profile } from '../../onboarding'
 
-const STEPS = 7
+const STEPS = 6
 
 const goals: { id: Goal; title: string; sub: string; icon: ReactNode }[] = [
   { id: 'muscle', title: 'Набрать мышечную массу', sub: 'Больше мышц и объёма', icon: <DumbbellIcon className="ob-i-dumbbell" /> },
@@ -29,9 +30,9 @@ const goals: { id: Goal; title: string; sub: string; icon: ReactNode }[] = [
 ]
 
 const levels: { id: Level; title: string; sub: string; bars: number }[] = [
-  { id: 'beginner', title: 'Новичок', sub: 'Не тренировался или меньше 6 месяцев', bars: 1 },
-  { id: 'intermediate', title: 'Средний', sub: 'Регулярно от 6 месяцев до 2 лет', bars: 2 },
-  { id: 'advanced', title: 'Продвинутый', sub: 'Регулярно больше 2 лет', bars: 3 },
+  { id: 'beginner', title: 'Новичок', sub: 'до 6 месяцев', bars: 1 },
+  { id: 'intermediate', title: 'Средний', sub: '6 месяцев – 2 года', bars: 2 },
+  { id: 'advanced', title: 'Опытный', sub: 'более 2 лет', bars: 3 },
 ]
 
 const places: { id: Place; title: string; sub: string; icon: ReactNode }[] = [
@@ -52,17 +53,16 @@ const lifts: { id: Lift; title: string; img: string; start: number }[] = [
   { id: 'bench', title: 'Жим лёжа', img: benchImg, start: 40 },
   { id: 'squat', title: 'Присед', img: squatImg, start: 50 },
   { id: 'deadlift', title: 'Становая тяга', img: deadliftImg, start: 60 },
-  { id: 'curl', title: 'Сгибание на бицепс', img: curlImg, start: 15 },
 ]
 
-/** Значения барабана: 0–300 кг с шагом 2,5. */
-const WEIGHTS = Array.from({ length: 121 }, (_, i) => i * 2.5)
-const fmtKg = (v: number) => String(v).replace('.', ',')
-
-const inRange = (v: string, min: number, max: number) => {
-  const n = Number(v.replace(',', '.'))
-  return v !== '' && Number.isFinite(n) && n >= min && n <= max
-}
+/** Параметры барабана для числовых полей анкеты. start — где барабан открывается, если значения ещё нет. */
+type NumKey = 'age' | 'height' | 'weight' | 'targetWeight'
+const numFields: { key: NumKey; label: string; unit: string; min: number; max: number; start: (p: Profile) => number }[] = [
+  { key: 'age', label: 'Возраст', unit: 'лет', min: 14, max: 80, start: () => 25 },
+  { key: 'height', label: 'Рост', unit: 'см', min: 120, max: 230, start: (p) => (p.gender === 'female' ? 165 : 175) },
+  { key: 'weight', label: 'Вес', unit: 'кг', min: 35, max: 250, start: (p) => (p.gender === 'female' ? 60 : 75) },
+  { key: 'targetWeight', label: 'Желаемый вес', unit: 'кг', min: 35, max: 250, start: (p) => p.weight ?? (p.gender === 'female' ? 60 : 75) },
+]
 
 const toggle = (list: string[], item: string) => (list.includes(item) ? list.filter((x) => x !== item) : [...list, item])
 
@@ -84,13 +84,12 @@ export function Onboarding({ onExit, onDone }: Props) {
   const set = <K extends keyof Profile>(key: K, value: Profile[K]) => setP((prev) => ({ ...prev, [key]: value }))
 
   const valid: Record<number, boolean> = {
-    1: p.gender !== null && inRange(p.age, 14, 80) && inRange(p.height, 120, 230) && inRange(p.weight, 35, 250) && (p.targetWeight === '' || inRange(p.targetWeight, 35, 250)),
+    1: p.gender !== null && p.age !== null && p.height !== null && p.weight !== null,
     2: p.goal !== null,
-    3: p.level !== null && (p.benchUnknown || p.bench === '' || inRange(p.bench, 0, 400)),
+    3: p.level !== null,
     4: p.place !== null,
     5: p.perWeek !== null && p.minutes !== null && (p.autoDays || p.days.length === p.perWeek),
     6: true,
-    7: lifts.every((l) => p.workingWeights[l.id] !== null || p.workingUnknown[l.id]),
   }
   const kbOpen = useKeyboardFit()
 
@@ -124,7 +123,6 @@ export function Onboarding({ onExit, onDone }: Props) {
         {step === 4 && <StepPlace p={p} set={set} />}
         {step === 5 && <StepSchedule p={p} set={set} />}
         {step === 6 && <StepPriority p={p} set={set} />}
-        {step === 7 && <StepWeights p={p} set={set} />}
       </div>
 
       <div className="ob__bottom">
@@ -153,27 +151,6 @@ function Head({ title, lead }: { title: string; lead: string }) {
   )
 }
 
-function NumField({ label, unit, value, onChange, placeholder = '—' }: { label: string; unit: string; value: string; onChange: (v: string) => void; placeholder?: string }) {
-  return (
-    <label className="ob-card ob-num">
-      <span className="ob-num__k">{label}</span>
-      <span className="ob-num__v">
-        <input
-          type="text"
-          inputMode="decimal"
-          autoComplete="off"
-          maxLength={5}
-          value={value}
-          placeholder={placeholder}
-          style={{ width: `${Math.max(value.length, 1) + 0.4}ch` }}
-          onChange={(e) => onChange(e.target.value.replace(/[^\d.,]/g, ''))}
-        />
-        <span className="ob-num__unit">{unit}</span>
-      </span>
-    </label>
-  )
-}
-
 function Option({ selected, onClick, icon, title, sub, className = '' }: { selected: boolean; onClick: () => void; icon: ReactNode; title: string; sub: string; className?: string }) {
   return (
     <button type="button" className={`ob-card ob-opt ${className}${selected ? ' sel' : ''}`} aria-pressed={selected} onClick={onClick}>
@@ -196,6 +173,9 @@ function Chip({ selected, onClick, children, className = '' }: { selected: boole
 }
 
 function StepAbout({ p, set }: StepProps) {
+  const [picking, setPicking] = useState<NumKey | null>(null)
+  const field = numFields.find((f) => f.key === picking)
+
   return (
     <>
       <Head title="О тебе" lead="Нужно, чтобы рассчитать нагрузку и стартовые веса под вас." />
@@ -205,7 +185,7 @@ function StepAbout({ p, set }: StepProps) {
             <button
               key={g}
               type="button"
-              className={`ob-card ob-g${p.gender === g ? ' sel' : ''}`}
+              className={`card ob-sel ob-g${p.gender === g ? ' sel' : ''}`}
               aria-pressed={p.gender === g}
               onClick={() => set('gender', g)}
             >
@@ -216,13 +196,32 @@ function StepAbout({ p, set }: StepProps) {
           ))}
         </div>
         <div className="ob-grid2">
-          <NumField label="Возраст" unit="лет" value={p.age} onChange={(v) => set('age', v)} />
-          <NumField label="Рост" unit="см" value={p.height} onChange={(v) => set('height', v)} />
-          <NumField label="Вес" unit="кг" value={p.weight} onChange={(v) => set('weight', v)} />
-          <NumField label="Желаемый вес" unit="кг" value={p.targetWeight} onChange={(v) => set('targetWeight', v)} placeholder="—" />
+          {numFields.map((f) => (
+            <button key={f.key} type="button" className="card ob-num" onClick={() => setPicking(f.key)}>
+              <span className="ob-num__k">{f.label}</span>
+              <span className="ob-num__v">
+                <span className={p[f.key] === null ? 'ob-num__empty' : undefined}>{p[f.key] ?? '—'}</span>
+                <span className="ob-num__unit">{f.unit}</span>
+              </span>
+            </button>
+          ))}
         </div>
         <p className="ob__label ob__label--center">Желаемый вес — необязательно</p>
       </div>
+      <NumericWheelPicker
+        open={field !== undefined}
+        title={field?.label ?? ''}
+        value={field ? (p[field.key] ?? field.start(p)) : 0}
+        min={field?.min ?? 0}
+        max={field?.max ?? 0}
+        step={1}
+        unit={field?.unit}
+        onClose={() => setPicking(null)}
+        onConfirm={(v) => {
+          if (field) set(field.key, v)
+          setPicking(null)
+        }}
+      />
     </>
   )
 }
@@ -241,53 +240,65 @@ function StepGoal({ p, set }: StepProps) {
 }
 
 function StepLevel({ p, set }: StepProps) {
+  const [picking, setPicking] = useState<Lift | null>(null)
+  const lift = lifts.find((l) => l.id === picking)
+
   return (
     <>
-      <Head title="Твой уровень" lead="От этого зависят упражнения, объём и стартовые веса." />
-      <div className="ob__body">
+      <h1 className="ob__title ob__title--sm">Твой уровень</h1>
+      <div className="ob-levels">
         {levels.map((l) => (
-          <Option
-            key={l.id}
-            className="ob-lvl"
-            selected={p.level === l.id}
-            onClick={() => set('level', l.id)}
-            icon={
-              <span className="ob-bars" aria-hidden>
-                {[1, 2, 3].map((n) => (
-                  <i key={n} className={n <= l.bars ? 'on' : undefined} />
-                ))}
+          <button key={l.id} type="button" className={`card ob-sel ob-level${p.level === l.id ? ' sel' : ''}`} aria-pressed={p.level === l.id} onClick={() => set('level', l.id)}>
+            {p.level === l.id && (
+              <span className="ob-level__check" aria-hidden>
+                <CheckIcon />
               </span>
-            }
-            title={l.title}
-            sub={l.sub}
-          />
-        ))}
-        <p className="ob__label">
-          Сколько жмёте лёжа на 1 раз? <small>— необязательно</small>
-        </p>
-        <div className="ob-grid2">
-          <NumField
-            label="Жим лёжа"
-            unit="кг"
-            value={p.benchUnknown ? '' : p.bench}
-            onChange={(v) => {
-              set('bench', v)
-              set('benchUnknown', false)
-            }}
-          />
-          <button
-            type="button"
-            className={`ob-card ob-unknown${p.benchUnknown ? ' sel' : ''}`}
-            aria-pressed={p.benchUnknown}
-            onClick={() => {
-              set('benchUnknown', !p.benchUnknown)
-              set('bench', '')
-            }}
-          >
-            Не знаю
+            )}
+            <span className="ob-level__bars" aria-hidden>
+              {[1, 2, 3].map((n) => (
+                <i key={n} className={n <= l.bars ? 'on' : undefined} />
+              ))}
+            </span>
+            <span className="ob-level__title">{l.title}</span>
+            <span className="ob-level__sub">{l.sub}</span>
           </button>
-        </div>
+        ))}
       </div>
+
+      <section className="card ob-weights">
+        <h2 className="ob-weights__title">Твои рабочие веса</h2>
+        {lifts.map((l) => {
+          const v = p.workingWeights[l.id]
+          return (
+            <button key={l.id} type="button" className="ob-weight" onClick={() => setPicking(l.id)}>
+              <span className="ob-weight__tile">
+                <img src={l.img} alt="" draggable={false} />
+              </span>
+              <span className="ob-weight__name">{l.title}</span>
+              <span className="ob-weight__value">
+                <span className={v === null ? 'ob-num__empty' : undefined}>{v ?? '—'}</span>
+                <span className="ob-num__unit">кг</span>
+                <ChevronRightIcon />
+              </span>
+            </button>
+          )
+        })}
+      </section>
+
+      <NumericWheelPicker
+        open={lift !== undefined}
+        title={lift?.title ?? ''}
+        value={lift ? (p.workingWeights[lift.id] ?? lift.start) : 0}
+        min={1}
+        max={300}
+        step={1}
+        unit="кг"
+        onClose={() => setPicking(null)}
+        onConfirm={(v) => {
+          if (lift) set('workingWeights', { ...p.workingWeights, [lift.id]: v })
+          setPicking(null)
+        }}
+      />
     </>
   )
 }
@@ -449,118 +460,6 @@ const FemaleIcon = () => (
     <path d="M12 14.5V22M8.5 18.5h7" />
   </svg>
 )
-
-function StepWeights({ p, set }: StepProps) {
-  const [picking, setPicking] = useState<Lift | null>(null)
-  const current = lifts.find((l) => l.id === picking)
-
-  return (
-    <>
-      <Head title="Твои рабочие веса" lead="Эти веса помогут AI составить тренировки под твой уровень." />
-      <div className="ob__body">
-        {lifts.map((l) => {
-          const value = p.workingWeights[l.id]
-          const unknown = p.workingUnknown[l.id]
-          return (
-            <div key={l.id} className="ob-card ob-lift">
-              <img className="ob-lift__img" src={l.img} alt="" draggable={false} />
-              <div className="ob-lift__main">
-                <span className="ob-lift__title">{l.title}</span>
-                <div className="ob-lift__row">
-                  <button type="button" className={`ob-lift__field${value !== null ? ' has' : ''}`} onClick={() => setPicking(l.id)} aria-label={`${l.title}: рабочий вес`}>
-                    <span>{value !== null ? fmtKg(value) : '—'}</span>
-                    <span className="ob-lift__unit">кг</span>
-                  </button>
-                  <button
-                    type="button"
-                    className={`ob-lift__unknown${unknown ? ' sel' : ''}`}
-                    aria-pressed={unknown}
-                    onClick={() => {
-                      set('workingUnknown', { ...p.workingUnknown, [l.id]: !unknown })
-                      set('workingWeights', { ...p.workingWeights, [l.id]: null })
-                    }}
-                  >
-                    Не знаю
-                  </button>
-                </div>
-              </div>
-            </div>
-          )
-        })}
-      </div>
-      {current && (
-        <WeightSheet
-          title={current.title}
-          initial={p.workingWeights[current.id] ?? current.start}
-          onClose={() => setPicking(null)}
-          onDone={(v) => {
-            set('workingWeights', { ...p.workingWeights, [current.id]: v })
-            set('workingUnknown', { ...p.workingUnknown, [current.id]: false })
-            setPicking(null)
-          }}
-        />
-      )}
-    </>
-  )
-}
-
-const ITEM_H = 48
-
-/** Нижняя шторка с барабаном веса (шаг 2,5 кг). */
-function WeightSheet({ title, initial, onClose, onDone }: { title: string; initial: number; onClose: () => void; onDone: (v: number) => void }) {
-  const listRef = useRef<HTMLDivElement>(null)
-  const [index, setIndex] = useState(() => Math.max(0, WEIGHTS.indexOf(initial)))
-  const [shown, setShown] = useState(false)
-
-  const itemH = () => (listRef.current?.firstElementChild?.nextElementSibling as HTMLElement | null)?.offsetHeight || ITEM_H
-
-  useEffect(() => {
-    const el = listRef.current
-    if (el) el.scrollTop = index * itemH()
-    const id = requestAnimationFrame(() => setShown(true))
-    return () => cancelAnimationFrame(id)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  const onScroll = () => {
-    const el = listRef.current
-    if (!el) return
-    const i = Math.round(el.scrollTop / itemH())
-    setIndex(Math.min(WEIGHTS.length - 1, Math.max(0, i)))
-  }
-
-  const pick = (i: number) => listRef.current?.scrollTo({ top: i * itemH(), behavior: 'smooth' })
-
-  return (
-    <div className={`ob-sheet${shown ? ' is-shown' : ''}`} role="dialog" aria-modal="true" aria-label={title}>
-      <button type="button" className="ob-sheet__scrim" aria-label="Закрыть" onClick={onClose} />
-      <div className="ob-sheet__panel">
-        <span className="ob-sheet__grab" />
-        <h2 className="ob-sheet__title">{title}</h2>
-        <div className="ob-wheel">
-          <div className="ob-wheel__sel" aria-hidden>
-            <span className="ob-wheel__unit">кг</span>
-          </div>
-          <div className="ob-wheel__list" ref={listRef} onScroll={onScroll}>
-            <div className="ob-wheel__pad" />
-            {WEIGHTS.map((w, i) => {
-              const d = Math.abs(i - index)
-              return (
-                <button key={w} type="button" className={`ob-wheel__item d${Math.min(d, 4)}`} onClick={() => pick(i)} tabIndex={-1}>
-                  {fmtKg(w)}
-                </button>
-              )
-            })}
-            <div className="ob-wheel__pad" />
-          </div>
-        </div>
-        <button type="button" className="ob__cta ob-sheet__done tappable" onClick={() => onDone(WEIGHTS[index])}>
-          Готово
-        </button>
-      </div>
-    </div>
-  )
-}
 
 /**
  * Держит активное поле над клавиатурой iOS в Telegram Mini App.

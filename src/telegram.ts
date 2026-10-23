@@ -5,6 +5,7 @@ type TgWebApp = {
   setBackgroundColor(color: string): void
   setBottomBarColor?(color: string): void
   disableVerticalSwipes?(): void
+  HapticFeedback?: { selectionChanged?(): void }
 }
 
 const BG = '#010509'
@@ -19,4 +20,13 @@ export function initTelegram() {
   tg.setBackgroundColor(BG)
   tg.setBottomBarColor?.(BG)
   tg.disableVerticalSwipes?.()
+}
+
+/** Очень лёгкий тактильный отклик при смене значения; вне Telegram ничего не делает. */
+export function hapticSelection() {
+  try {
+    ;(window as unknown as { Telegram?: { WebApp?: TgWebApp } }).Telegram?.WebApp?.HapticFeedback?.selectionChanged?.()
+  } catch {
+    // недоступно — не критично
+  }
 }

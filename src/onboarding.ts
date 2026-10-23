@@ -5,19 +5,17 @@ export type Gender = 'male' | 'female'
 export type Goal = 'muscle' | 'fat_loss' | 'strength' | 'definition' | 'maintain'
 export type Level = 'beginner' | 'intermediate' | 'advanced'
 export type Place = 'gym' | 'home_equipment' | 'home_bodyweight' | 'outdoor'
-export type Lift = 'bench' | 'squat' | 'deadlift' | 'curl'
+export type Lift = 'bench' | 'squat' | 'deadlift'
 
 /** Ответы анкеты — на их основе строится персональная программа. */
 export type Profile = {
   gender: Gender | null
-  age: string
-  height: string
-  weight: string
-  targetWeight: string
+  age: number | null
+  height: number | null
+  weight: number | null
+  targetWeight: number | null
   goal: Goal | null
   level: Level | null
-  bench: string
-  benchUnknown: boolean
   place: Place | null
   equipment: string[]
   perWeek: number | null
@@ -29,20 +27,16 @@ export type Profile = {
   notes: string
   /** Рабочие веса (кг, на 8–12 повторений) — стартовые веса для персональных тренировок. null — не указан. */
   workingWeights: Record<Lift, number | null>
-  /** Пользователь нажал «Не знаю» для упражнения. */
-  workingUnknown: Record<Lift, boolean>
 }
 
 export const emptyProfile: Profile = {
   gender: null,
-  age: '',
-  height: '',
-  weight: '',
-  targetWeight: '',
+  age: null,
+  height: null,
+  weight: null,
+  targetWeight: null,
   goal: null,
   level: null,
-  bench: '',
-  benchUnknown: false,
   place: null,
   equipment: [],
   perWeek: null,
@@ -52,8 +46,7 @@ export const emptyProfile: Profile = {
   priorities: [],
   limits: [],
   notes: '',
-  workingWeights: { bench: null, squat: null, deadlift: null, curl: null },
-  workingUnknown: { bench: false, squat: false, deadlift: false, curl: false },
+  workingWeights: { bench: null, squat: null, deadlift: null },
 }
 
 /** Прошёл ли пользователь onboarding. Пока хранится на устройстве; позже — из API. */
@@ -77,6 +70,16 @@ export function markOnboarded() {
 export function saveProfile(profile: Profile) {
   try {
     localStorage.setItem(PROFILE_KEY, JSON.stringify({ ...profile, savedAt: new Date().toISOString() }))
+  } catch {
+    // хранилище недоступно — не критично
+  }
+}
+
+/** Сбрасывает статус и ответы анкеты (для повторного прохождения). */
+export function resetOnboarding() {
+  try {
+    localStorage.removeItem(KEY)
+    localStorage.removeItem(PROFILE_KEY)
   } catch {
     // хранилище недоступно — не критично
   }

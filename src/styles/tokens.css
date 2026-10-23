@@ -13,3 +13,10 @@
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Inter Variable', system-ui, sans-serif;
 }
+
+/* поверхности и свечение Главной — общие для новых компонентов (значения из .card и .cta) */
+:root {
+  --surface: radial-gradient(130% 160% at 50% 30%, #0c1c29 0%, #07131c 70%);
+  --surface-highlight: inset 0 1px 0 rgba(170, 210, 250, 0.07);
+  --glow: rgba(90, 150, 220, 0.22);
+}

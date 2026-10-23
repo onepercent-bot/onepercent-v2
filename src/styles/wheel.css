@@ -1,0 +1,144 @@
+/* Общий барабан One% (NumericWheelPicker). Цвета и поверхности — токены Главной. */
+.wheel-lock .home,
+.wheel-lock .ob__scroll {
+  overflow: hidden;
+}
+
+.wheel-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  font-family: var(--font);
+}
+.wheel-sheet__scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(1, 5, 9, 0.62);
+  opacity: 0;
+  transition: opacity 280ms var(--ease-out);
+}
+.wheel-sheet.is-shown .wheel-sheet__scrim {
+  opacity: 1;
+}
+.wheel-sheet__panel {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 0.625rem 1.375rem calc(env(safe-area-inset-bottom, 0px) + 1.25rem);
+  border: 1px solid var(--border);
+  border-bottom: 0;
+  border-radius: 1.5rem 1.5rem 0 0;
+  background: var(--surface), var(--bg);
+  box-shadow: var(--surface-highlight), 0 -0.625rem 2.5rem rgba(0, 0, 0, 0.55);
+  transform: translateY(100%);
+  transition: transform 320ms var(--ease-out);
+}
+.wheel-sheet.is-shown .wheel-sheet__panel {
+  transform: none;
+}
+.wheel-sheet__grab {
+  display: block;
+  width: 2.25rem;
+  height: 0.25rem;
+  margin: 0 auto;
+  border-radius: 0.125rem;
+  background: rgba(140, 196, 251, 0.35);
+}
+.wheel-sheet__title {
+  margin-top: 0.625rem;
+  text-align: center;
+  font-size: 1.125rem;
+  line-height: 1.375rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.wheel {
+  --wheel-item: 2.125rem;
+  position: relative;
+  height: calc(var(--wheel-item) * var(--wheel-visible));
+  margin: 0.5rem 0 0.75rem;
+}
+.wheel__band {
+  position: absolute;
+  left: 0.5rem;
+  right: 0.5rem;
+  top: calc(var(--wheel-item) * (var(--wheel-visible) - 1) / 2);
+  height: var(--wheel-item);
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  border-radius: 0.75rem;
+  background: var(--surface);
+  box-shadow: var(--surface-highlight), 0 0 0.625rem var(--glow);
+  pointer-events: none;
+}
+.wheel__unit {
+  position: absolute;
+  left: calc(50% + 2.25rem);
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1rem;
+  color: var(--accent);
+}
+.wheel__list {
+  position: relative;
+  height: 100%;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  scrollbar-width: none;
+  outline: none;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 28%, #000 72%, transparent 100%);
+  mask-image: linear-gradient(180deg, transparent 0%, #000 28%, #000 72%, transparent 100%);
+}
+.wheel__list::-webkit-scrollbar {
+  display: none;
+}
+.wheel__track {
+  position: relative;
+}
+/* точки привязки: каждое значение встаёт в центр барабана */
+.wheel__item {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: var(--wheel-item);
+  margin-top: calc(var(--wheel-item) * (var(--wheel-visible) - 1) / 2);
+  scroll-snap-align: center;
+  display: grid;
+  place-items: center;
+  font-size: 1.1875rem;
+  font-variant-numeric: tabular-nums;
+  color: color-mix(in srgb, var(--accent-soft) 30%, transparent);
+  transition: color 120ms, font-size 120ms;
+}
+.wheel__item.d0 {
+  font-size: 1.625rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.wheel__item.d1 {
+  font-size: 1.3125rem;
+  color: color-mix(in srgb, var(--accent-soft) 75%, transparent);
+}
+.wheel__item.d2 {
+  color: color-mix(in srgb, var(--accent-soft) 45%, transparent);
+}
+.wheel-sheet__done {
+  width: 100%;
+  height: 2.75rem;
+  margin-top: 0;
+  font-size: 1rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wheel-sheet__panel,
+  .wheel-sheet__scrim {
+    transition: none;
+  }
+}
