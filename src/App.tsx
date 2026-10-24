@@ -12,13 +12,23 @@ type Screen = 'welcome' | 'onboarding' | 'summit' | 'app'
 export function App() {
   const [screen, setScreen] = useState<Screen>(() => (isOnboarded() ? 'app' : 'welcome'))
   const [tab, setTab] = useState<Tab>('home')
+  // откуда открыта анкета: «назад» с первого шага возвращает туда же
+  const [from, setFrom] = useState<'welcome' | 'profile'>('welcome')
 
-  if (screen === 'welcome') return <Welcome onStart={() => setScreen('onboarding')} />
+  if (screen === 'welcome')
+    return (
+      <Welcome
+        onStart={() => {
+          setFrom('welcome')
+          setScreen('onboarding')
+        }}
+      />
+    )
 
   if (screen === 'onboarding') {
     return (
       <Onboarding
-        onExit={() => setScreen('welcome')}
+        onExit={() => setScreen(from === 'profile' ? 'app' : 'welcome')}
         onDone={(profile) => {
           saveProfile(profile)
           markOnboarded()
@@ -41,7 +51,12 @@ export function App() {
 
   return (
     <div className="app">
-      {tab === 'profile' ? <Profile onRestartOnboarding={() => setScreen('onboarding')} /> : <Home />}
+      {tab === 'profile' ? <Profile
+          onRestartOnboarding={() => {
+            setFrom('profile')
+            setScreen('onboarding')
+          }}
+        /> : <Home />}
       <BottomNav active={tab === 'profile' ? 'profile' : 'home'} onSelect={(t) => (t === 'home' || t === 'profile') && setTab(t)} />
     </div>
   )

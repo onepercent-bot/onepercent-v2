@@ -73,7 +73,9 @@ function Wheel({ value, min, max, step, unit, onChange, onPick }: { value: numbe
   const listRef = useRef<HTMLDivElement>(null)
   const [index, setIndex] = useState(() => toIndex(value))
   const indexRef = useRef(index)
-  const itemH = () => (listRef.current?.querySelector('.wheel__item') as HTMLElement | null)?.offsetHeight || 40
+  // высота строки дробная (размеры масштабируются от ширины экрана) — offsetHeight округляет и сбивает индекс
+  const itemH = () => listRef.current?.querySelector('.wheel__item')?.getBoundingClientRect().height || 40
+  const indexAt = (el: HTMLElement) => Math.min(count - 1, Math.max(0, Math.round(el.scrollTop / itemH())))
 
   useLayoutEffect(() => {
     if (listRef.current) listRef.current.scrollTop = indexRef.current * itemH()
@@ -82,7 +84,7 @@ function Wheel({ value, min, max, step, unit, onChange, onPick }: { value: numbe
   const onScroll = () => {
     const el = listRef.current
     if (!el) return
-    const i = Math.min(count - 1, Math.max(0, Math.round(el.scrollTop / itemH())))
+    const i = indexAt(el)
     if (i !== indexRef.current) {
       indexRef.current = i
       setIndex(i)
@@ -101,11 +103,9 @@ function Wheel({ value, min, max, step, unit, onChange, onPick }: { value: numbe
     e.preventDefault()
   }
 
-  // рендерим только окрестность выбранного значения — диапазоны бывают большими
-  const from = Math.max(0, index - 40)
-  const to = Math.min(count - 1, index + 40)
+  // все значения в DOM: у каждого своя точка привязки, быстрый «бросок» всегда доводится до значения
   const items = []
-  for (let i = from; i <= to; i++) {
+  for (let i = 0; i < count; i++) {
     const d = Math.abs(i - index)
     items.push(
       <button key={i} type="button" tabIndex={-1} className={`wheel__item d${Math.min(d, 3)}`} style={{ top: `calc(${i} * var(--wheel-item))` }} onClick={() => scrollTo(i)}>
@@ -137,7 +137,7 @@ function Wheel({ value, min, max, step, unit, onChange, onPick }: { value: numbe
           </div>
         </div>
       </div>
-      <button type="button" className="cta wheel-sheet__done tappable" onClick={() => onPick(toValue(index))}>
+      <button type="button" className="cta wheel-sheet__done tappable" onClick={() => onPick(toValue(listRef.current ? indexAt(listRef.current) : index))}>
         Готово
       </button>
     </>
