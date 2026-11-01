@@ -1,0 +1,240 @@
+/* раздел «Упражнения» — на токенах и карточках Главной */
+.ex {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  padding: 1.8438rem 1.2875rem 1rem 1.4312rem;
+}
+.ex::-webkit-scrollbar {
+  display: none;
+}
+
+.ex__head {
+  margin-bottom: 1rem;
+}
+.ex__bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  min-height: 2rem;
+}
+.ex__title {
+  font-size: 1rem;
+  line-height: 1.375rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.ex__sub {
+  margin-top: 0.125rem;
+  font-size: 0.6719rem;
+  line-height: 0.8125rem;
+  color: var(--accent-soft);
+}
+
+.ex__back {
+  flex: none;
+  width: 2rem;
+  height: 2rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--surface-highlight);
+  color: var(--accent);
+}
+.ex__back svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.ex__go {
+  margin-left: auto;
+  flex: none;
+  width: 0.8125rem;
+  height: 0.8125rem;
+  color: var(--accent);
+}
+
+/* группы мышц */
+.ex__groups,
+.ex__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.ex__group {
+  width: 100%;
+  height: 3.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0 0.9375rem;
+  text-align: left;
+}
+.ex__group-name {
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+.ex__group-count {
+  font-size: 0.6719rem;
+  color: var(--accent-soft);
+  font-variant-numeric: tabular-nums;
+  margin-left: auto;
+}
+.ex__group-count + .ex__go {
+  margin-left: 0;
+}
+
+/* список */
+.ex__row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.4375rem 0.9375rem 0.4375rem 0.4375rem;
+  text-align: left;
+}
+.ex__thumb {
+  flex: none;
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 0.6875rem;
+  overflow: hidden;
+  background: #f4f6f8;
+}
+.ex__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.ex__text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+.ex__name {
+  font-size: 0.7812rem;
+  line-height: 0.9375rem;
+  color: var(--text);
+}
+.ex__meta {
+  font-size: 0.6094rem;
+  line-height: 0.75rem;
+  color: var(--accent-soft);
+}
+
+/* карточка: светлая «студия» под белый фон видео Vital */
+.ex__studio {
+  aspect-ratio: 1;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  background: #ffffff;
+  box-shadow:
+    0 0 0 1px rgba(170, 210, 250, 0.18),
+    0 0.75rem 2rem var(--glow);
+}
+.ex__studio video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ex__card-title {
+  margin-top: 1rem;
+  font-size: 1.0625rem;
+  line-height: 1.375rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.ex__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-top: 0.625rem;
+}
+.ex__tag {
+  height: 1.5188rem;
+  display: flex;
+  align-items: center;
+  padding: 0 0.625rem;
+  border: 1px solid rgba(140, 180, 225, 0.16);
+  border-radius: 62.4375rem;
+  background: linear-gradient(180deg, rgba(22, 34, 46, 0.92), rgba(8, 15, 23, 0.92));
+  box-shadow: inset 0 1px 0 rgba(200, 225, 255, 0.08);
+  font-size: 0.625rem;
+  font-weight: 500;
+  color: var(--accent-soft);
+}
+.ex__tag.is-main {
+  color: var(--text);
+  border-color: rgba(175, 210, 245, 0.45);
+}
+
+.ex__steps {
+  margin-top: 0.875rem;
+  padding: 0.75rem 0.9375rem 0.5rem;
+}
+.ex__steps-title {
+  font-size: 0.7812rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+.ex__steps ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ex__steps li {
+  display: flex;
+  gap: 0.625rem;
+  padding: 0.5rem 0;
+  border-top: 1px solid rgba(150, 190, 255, 0.08);
+  font-size: 0.6875rem;
+  line-height: 0.9375rem;
+}
+.ex__steps li:first-child {
+  border-top: 0;
+}
+.ex__num {
+  flex: none;
+  width: 1rem;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+/* переключатель Зал / Дом */
+.ex__seg {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.25rem;
+  padding: 0.1875rem;
+  margin-bottom: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 62.4375rem;
+  background: var(--surface);
+  box-shadow: var(--surface-highlight);
+}
+.ex__seg-btn {
+  height: 1.75rem;
+  border-radius: 62.4375rem;
+  font-size: 0.7188rem;
+  font-weight: 500;
+  color: var(--accent-soft);
+}
+.ex__seg-btn span {
+  margin-left: 0.25rem;
+  opacity: 0.7;
+  font-variant-numeric: tabular-nums;
+}
+.ex__seg-btn.is-on {
+  color: var(--text);
+  border: 1px solid rgba(175, 210, 245, 0.45);
+  background: linear-gradient(90deg, #3d5870 0%, #2c4153 50%, #3d5870 100%);
+}

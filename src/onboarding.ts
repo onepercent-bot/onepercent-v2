@@ -75,6 +75,16 @@ export function saveProfile(profile: Profile) {
   }
 }
 
+/** Читает сохранённую анкету (null — анкеты нет). */
+export function loadProfile(): Profile | null {
+  try {
+    const raw = localStorage.getItem(PROFILE_KEY)
+    return raw ? (JSON.parse(raw) as Profile) : null
+  } catch {
+    return null
+  }
+}
+
 /** Сбрасывает статус и ответы анкеты (для повторного прохождения). */
 export function resetOnboarding() {
   try {

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Home } from './screens/Home'
 import { Profile } from './screens/Profile'
+import { Exercises } from './screens/Exercises'
 import { Summit } from './screens/Summit'
 import { Welcome } from './screens/Welcome'
 import { Onboarding } from './screens/onboarding/Onboarding'
@@ -56,8 +57,8 @@ export function App() {
             setFrom('profile')
             setScreen('onboarding')
           }}
-        /> : <Home />}
-      <BottomNav active={tab === 'profile' ? 'profile' : 'home'} onSelect={(t) => (t === 'home' || t === 'profile') && setTab(t)} />
+        /> : tab === 'exercises' ? <Exercises /> : <Home />}
+      <BottomNav active={tab === 'analytics' ? 'home' : tab} onSelect={(t) => t !== 'analytics' && setTab(t)} />
     </div>
   )
 }
