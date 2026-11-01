@@ -15,7 +15,7 @@ React 19 + TypeScript + Vite. Без роутера и бэкенда. Шриф�
 | NumericWheelPicker | `src/components/NumericWheelPicker.tsx` |
 | Summit (гора) | `src/screens/Summit.tsx` |
 | Home | `src/screens/Home.tsx` + `src/components/*`, данные — `src/data/home.ts` (mock) |
-| Упражнения | `src/screens/Exercises.tsx`, данные — `src/data/exercises.ts` (+ приватный `src/data/private/vital.json`, вне git) |
+| Упражнения | `src/screens/Exercises.tsx`, данные — `src/data/exercises.ts` (+ зашифрованные `public/data/ex*.bin`) |
 | Profile | `src/screens/Profile.tsx` — заглушка + временная кнопка сброса анкеты (`src/dev/`) |
 
 ## Архитектура
@@ -24,8 +24,8 @@ React 19 + TypeScript + Vite. Без роутера и бэкенда. Шриф�
 - В нижней навигации 4 пункта; «Аналитика» пока не подключена.
 - Упражнения: группа мышц → Зал/Дом → список → карточка (видео Bunny по кругу, мышцы, инвентарь, уровень, техника).
   Персонаж по полу из анкеты: мужчинам мужские манекены, женщинам блондинка + девушка-манекен; «Дом» (брюнетка) — всем.
-  Данные собирает скрипт владельца/ассистента из `vital-exercises.json` + Bunny API в `src/data/private/vital.json` (в `.gitignore`).
-  Без этого файла раздел пустой — в Netlify-сборке данных пока нет (вопрос доставки данных открыт).
+  Данные: `vital-exercises.json` + Bunny API → `src/data/private/vital.json` (вне git) → зашифрованные `public/data/ex.gz.bin` / `ex.bin`;
+  приложение скачивает и расшифровывает их при открытии раздела (`loadExercises`). Названия и техника — на русском.
 - Анкета: тип `Profile` и функции в `src/onboarding.ts`; хранится в `localStorage`
   (`onepercent:profile:v2`, флаг `onepercent:onboarded:v2`). Чтения анкеты в UI пока нет.
 - Telegram WebApp изолирован в `src/telegram.ts`.
@@ -46,7 +46,7 @@ React 19 + TypeScript + Vite. Без роутера и бэкенда. Шриф�
 
 ## Очередь модулей
 
-1. **Упражнения** — экраны готовы. Осталось: перевод техники на русский, доставка данных в прод-сборку, связь с Home (тап по мышце).
+1. **Упражнения** — экраны готовы. Осталось: связь с Home (тап по мышце), позже — перевести репозиторий в приватный.
 2. Muscle map (гибрид: купленная 3D-модель + маски мышц) — модель не выбрана.
 3. Тренировочный процесс: подходы / повторения / веса.
 4. История тренировок, прогрессия нагрузки.

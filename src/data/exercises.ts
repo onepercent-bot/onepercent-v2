@@ -20,8 +20,34 @@ export type Exercise = {
 
 type VitalFile = { cdn: string; exercises: Exercise[] }
 
-const files = import.meta.glob<VitalFile>('./private/vital.json', { eager: true, import: 'default' })
-const data: VitalFile = Object.values(files)[0] ?? { cdn: '', exercises: [] }
+// Данные Vital лежат в public/data зашифрованными (AES-GCM, решение владельца от 2026-11-01).
+const KEY_HEX = 'c5d5885dece19ca71279a5f573eba1ba1764674a204abeb63feb9e98100c5a23'
+
+let data: VitalFile = { cdn: '', exercises: [] }
+let loading: Promise<void> | null = null
+
+const hex = (h: string) => new Uint8Array(h.match(/../g)!.map((b) => parseInt(b, 16)))
+
+async function decrypt(buf: ArrayBuffer) {
+  const key = await crypto.subtle.importKey('raw', hex(KEY_HEX), 'AES-GCM', false, ['decrypt'])
+  return crypto.subtle.decrypt({ name: 'AES-GCM', iv: buf.slice(0, 12) }, key, buf.slice(12))
+}
+
+/** Загружает упражнения один раз; повторные вызовы ждут ту же загрузку. */
+export function loadExercises(): Promise<void> {
+  loading ??= (async () => {
+    const gz = typeof DecompressionStream !== 'undefined'
+    const res = await fetch(`${import.meta.env.BASE_URL}data/${gz ? 'ex.gz.bin' : 'ex.bin'}`)
+    if (!res.ok) throw new Error(`exercises: ${res.status}`)
+    let plain = await decrypt(await res.arrayBuffer())
+    if (gz) plain = await new Response(new Blob([plain]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer()
+    data = JSON.parse(new TextDecoder().decode(plain)) as VitalFile
+  })().catch((e) => {
+    loading = null
+    throw e
+  })
+  return loading
+}
 
 // Видео с персонажем своего пола: мужчинам — мужские манекены, женщинам — женские.
 // Домашняя коллекция одна на всех. Пол не указан — показываем всё.
@@ -31,7 +57,7 @@ const forMe = (e: Exercise) => {
   return !gender || e.model === 'any' || e.model === gender
 }
 
-export type Group = { id: string; name: string; parts: string[] }
+export type Group ={ id: string; name: string; parts: string[] }
 
 export const groups: Group[] = [
   { id: 'chest', name: 'Грудь', parts: ['chest'] },

@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ChevronLeftIcon, ChevronRightIcon } from '../components/Icons'
 import {
   byGroup,
   equipmentName,
   groups,
   levelName,
+  loadExercises,
   muscleName,
   posterUrl,
   videoUrl,
@@ -16,6 +17,14 @@ import {
 export function Exercises() {
   const [group, setGroup] = useState<Group | null>(null)
   const [exercise, setExercise] = useState<Exercise | null>(null)
+  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
+
+  useEffect(() => {
+    loadExercises().then(
+      () => setStatus('ready'),
+      () => setStatus('error'),
+    )
+  }, [])
 
   if (exercise) return <ExerciseCard exercise={exercise} onBack={() => setExercise(null)} />
   if (group) return <ExerciseList group={group} onBack={() => setGroup(null)} onOpen={setExercise} />
@@ -24,14 +33,17 @@ export function Exercises() {
     <main className="ex">
       <header className="ex__head">
         <h1 className="ex__title">Упражнения</h1>
-        <p className="ex__sub">Выберите группу мышц</p>
+        <p className="ex__sub">
+          {status === 'loading' ? 'Загружаем упражнения…' : status === 'error' ? 'Не удалось загрузить. Проверьте интернет' : 'Выберите группу мышц'}
+        </p>
       </header>
       <ul className="ex__groups">
         {groups.map((g) => (
           <li key={g.id}>
-            <button type="button" className="card ex__group tappable" onClick={() => setGroup(g)}>
+            <button type="button" className="card ex__group tappable" disabled={status !== 'ready'}
+              onClick={() => setGroup(g)}>
               <span className="ex__group-name">{g.name}</span>
-              <span className="ex__group-count">{byGroup(g).length}</span>
+              <span className="ex__group-count">{status === 'ready' ? byGroup(g).length : ''}</span>
               <ChevronRightIcon className="ex__go" />
             </button>
           </li>
