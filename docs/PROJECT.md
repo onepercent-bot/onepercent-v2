@@ -30,6 +30,7 @@ React 19 + TypeScript + Vite. Без роутера и бэкенда. Шриф�
 ## Данные Vital Animations (куплено)
 
 - Хранятся у владельца на Mac (`1600VitalAnimations`), в репозиторий не кладутся.
+- Все 7 JSON (1231 упражнение) сведены в один файл и лежат в приватном артефакте владельца: https://claude.ai/artifact/1S5AMVGU6tVYQgqXRGjCgF (файл `vital-exercises.json`, читать через Artifact read с `path`).
 - Структура: коллекции → папка видео `NNNN.mp4` + JSON. Видео: белый фон, 3D-манекен.
 - Поля JSON: `id, name, bodyPart, target, secondaryMuscles, equipment, instructions, description, difficulty, category` (англ.).
 - `id` уникальны во всех коллекциях → видео связывается по `id`.
