@@ -1,0 +1,179 @@
+/* Экран горы после анкеты. Цвета и шрифт — токены Главной. */
+.summit {
+  position: relative;
+  height: 100dvh;
+  max-width: 480px;
+  margin: 0 auto;
+  overflow: hidden;
+  background: var(--bg);
+  font-family: var(--font);
+}
+.summit__stage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 851px;
+  height: 1848px;
+  transform-origin: 0 0;
+}
+.summit__bg,
+.summit__svg {
+  position: absolute;
+  inset: 0;
+  display: block;
+  pointer-events: none;
+}
+
+/* маршрут */
+.summit__trail {
+  fill: none;
+  stroke: rgba(140, 196, 251, 0.1);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 2 9;
+}
+.summit__line,
+.summit__halo {
+  fill: none;
+  stroke: var(--accent);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.summit__line {
+  stroke-width: 5;
+  stroke: color-mix(in srgb, var(--accent) 60%, #fff);
+}
+.summit__halo {
+  stroke-width: 18;
+  opacity: 0.6;
+}
+.summit__tip {
+  opacity: 0;
+}
+
+/* точки маршрута */
+.summit__dot-core {
+  fill: rgba(7, 19, 28, 0.85);
+  stroke: rgba(140, 196, 251, 0.22);
+  stroke-width: 2;
+  transition: fill 280ms var(--ease-out), stroke 280ms var(--ease-out);
+}
+.summit__dot-glow {
+  fill: var(--accent);
+  opacity: 0;
+  transition: opacity 280ms var(--ease-out);
+}
+.summit__dot.is-on .summit__dot-core {
+  fill: url(#summit-dot-on);
+  stroke: rgba(255, 255, 255, 0.55);
+}
+.summit__dot.is-on .summit__dot-glow {
+  opacity: 0.6;
+}
+
+/* флаг: свечение включается один раз на вершине */
+.summit__pole {
+  stroke: rgba(190, 210, 230, 0.35);
+  stroke-width: 4;
+  stroke-linecap: round;
+  transition: stroke 600ms var(--ease-out);
+}
+.summit__cloth {
+  fill: rgba(160, 185, 210, 0.22);
+  transition: fill 600ms var(--ease-out);
+}
+.summit__flag-glow {
+  fill: var(--accent);
+  opacity: 0;
+  transition: opacity 700ms var(--ease-out);
+}
+.summit.is-flag .summit__pole {
+  stroke: #e3f0ff;
+}
+.summit.is-flag .summit__cloth {
+  fill: color-mix(in srgb, var(--accent) 45%, #fff);
+}
+.summit.is-flag .summit__flag-glow {
+  opacity: 0.7;
+}
+
+/* карточки этапов */
+.summit__card {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  padding: 0 26px 0 24px;
+  border: 2px solid var(--border);
+  border-radius: 24px;
+  background: var(--surface);
+  box-shadow: var(--surface-highlight), 0 0 20px rgba(0, 0, 0, 0.35);
+  color: var(--text);
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 280ms var(--ease-out), transform 280ms var(--ease-out);
+}
+.summit__card.is-on {
+  opacity: 1;
+  transform: none;
+}
+.summit__icon {
+  flex: none;
+  width: 46px;
+  height: 46px;
+  color: var(--accent);
+}
+.summit__icon--wide {
+  width: 52px;
+  height: 30px;
+}
+.summit__card-text {
+  display: flex;
+  flex-direction: column;
+  font-size: 22px;
+  line-height: 28px;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+}
+
+/* финал */
+.summit__bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: max(5.25rem, calc(env(safe-area-inset-bottom, 0px) + 2rem));
+  padding: 0 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+.summit__title {
+  font-size: 1.25rem;
+  line-height: 1.625rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  opacity: 0;
+  transform: translateY(0.4375rem);
+  transition: opacity 300ms var(--ease-out), transform 300ms var(--ease-out);
+}
+.summit__cta {
+  width: 100%;
+  height: 3.125rem;
+  margin-top: 0;
+  font-size: 1rem;
+  opacity: 0;
+  transform: translateY(0.4375rem);
+  transition: opacity 250ms var(--ease-out), transform 250ms var(--ease-out);
+}
+.summit__cta svg {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+.summit__title.is-on,
+.summit__cta.is-on {
+  opacity: 1;
+  transform: none;
+}
