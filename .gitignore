@@ -2,3 +2,6 @@ node_modules
 dist
 *.local
 *.tsbuildinfo
+
+# платные данные Vital — не коммитить
+src/data/private/
