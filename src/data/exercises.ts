@@ -11,7 +11,10 @@ export type Exercise = {
   target: string
   secondary: string[]
   equipment: string
-  place: 'gym' | 'home'
+  /** Коллекция Vital: зальная или «400 home workouts». */
+  collection: 'gym' | 'home'
+  /** Снаряды, нужные по описанию Vital (и по кадру видео, где Vital молчит): pullup_bar, bench, box, dumbbell, band… */
+  needs: string[]
   model: 'male' | 'female' | 'any'
   difficulty: string
   steps: string[]
@@ -51,19 +54,45 @@ export function loadExercises(): Promise<void> {
   return loading
 }
 
-// Персонаж своего пола: мужчинам — только мужские манекены, женщинам — только женские.
-// Домашняя коллекция (брюнетка) — женская; мужчинам «Дом» собирается из мужских упражнений
-// со своим весом и резинкой. Пол не указан — показываем всё.
-// Пол читается при каждом обращении: анкету могли пройти уже после загрузки приложения.
+// Персонаж своего пола: мужчинам — только мужские манекены, женщинам — только женские
+// (домашняя коллекция Vital снята на девушке). Пол не указан — показываем всё.
+// Пол читается при каждом обращении: анкету могли пройти уже после загрузки.
 const forMe = (e: Exercise) => {
   const gender = loadProfile()?.gender
   if (!gender) return true
   return e.model === gender || (e.model === 'any' && gender === 'female')
 }
 
-const homeKit = new Set(['body weight', 'resistance band', 'band'])
-const placeOf = (e: Exercise): Exercise['place'] =>
-  e.model === 'male' && homeKit.has(e.equipment) ? 'home' : e.place
+/* ── Где можно выполнить упражнение: Зал / Дом / Без инвентаря ──
+   Одна функция на всю библиотеку. Источник — поле equipment Vital и снаряды из описания (needs):
+   у Vital «body weight» стоит и у подтягиваний, брусьев, скамьи, поэтому смотрим оба. */
+export type Place = 'gym' | 'home' | 'none'
+
+// Инвентарь, которого дома нет: тренажёры, блоки, штанги, стационарные снаряды.
+const GYM_EQUIPMENT = new Set([
+  'barbell', 'machine', 'cable', 'leverage machine', 'smith machine', 'hex bar', 'trap bar',
+  'sled', 'battle rope', 'rope', 'assisted', 'vipr', 'trx',
+])
+// Снаряды из описания, которых дома нет.
+const GYM_NEEDS = new Set([
+  'pullup_bar', 'dip_bars', 'bench', 'box', 'roman_chair', 'rack', 'machine', 'barbell',
+  'suspension', 'parallettes', 'rings',
+])
+// В домашней коллекции Vital «скамья» и «тумба» — это диван, стул, ступенька.
+const FURNITURE = new Set(['bench', 'box'])
+
+const needsOf = (e: Exercise) => (e.collection === 'home' ? e.needs.map((n) => (FURNITURE.has(n) ? 'chair' : n)) : e.needs)
+
+export function placesOf(e: Exercise): Place[] {
+  const needs = needsOf(e)
+  const bodyweight = e.equipment === 'body weight'
+  const stationary = GYM_EQUIPMENT.has(e.equipment) || needs.some((n) => GYM_NEEDS.has(n))
+  const out: Place[] = []
+  if (!bodyweight || stationary) out.push('gym')
+  if (!stationary) out.push('home')
+  if (bodyweight && needs.length === 0) out.push('none')
+  return out
+}
 
 export type Group = {
   id: string
@@ -96,9 +125,9 @@ export const groups: Group[] = [
   { id: 'cardio', name: 'Кардио', parts: ['cardio'] },
 ]
 
-export const byGroup = (g: Group, place?: Exercise['place']) =>
+export const byGroup = (g: Group, place?: Place) =>
   data.exercises.filter(
-    (e) => g.parts.includes(e.bodyPart) && (!g.match || g.match(e)) && (!place || placeOf(e) === place) && forMe(e),
+    (e) => g.parts.includes(e.bodyPart) && (!g.match || g.match(e)) && (!place || placesOf(e).includes(place)) && forMe(e),
   )
 
 export const videoUrl = (e: Exercise) => (e.video ? `${data.cdn}/${e.video.guid}/play_${e.video.res}.mp4` : '')
@@ -185,6 +214,38 @@ const muscleRu: Record<string, string> = {
   forearms: 'Предплечья',
 }
 
+const needRu: Record<string, string> = {
+  pullup_bar: 'Турник',
+  dip_bars: 'Брусья',
+  bench: 'Скамья',
+  box: 'Тумба',
+  roman_chair: 'Стойка для пресса',
+  rack: 'Стойка',
+  machine: 'Тренажёр',
+  barbell: 'Штанга',
+  suspension: 'TRX',
+  parallettes: 'Параллетсы',
+  rings: 'Кольца',
+  dumbbell: 'Гантели',
+  kettlebell: 'Гиря',
+  plate: 'Блин',
+  medicine_ball: 'Медбол',
+  stability_ball: 'Фитбол',
+  band: 'Резинка',
+  slider: 'Слайдеры',
+  ab_wheel: 'Ролик',
+  ladder: 'Коорд. лестница',
+  chair: 'Стул',
+  weight: 'Отягощение',
+}
+
 export const equipmentName = (s: string) => equipmentRu[s] ?? s
+
+/** Подпись инвентаря: у Vital «свой вес» стоит и там, где нужен турник или блин — берём снаряд из описания. */
+export const equipmentOf = (e: Exercise) => {
+  if (e.equipment !== 'body weight') return equipmentName(e.equipment)
+  const need = needsOf(e).find((n) => needRu[n])
+  return need ? needRu[need] : equipmentName(e.equipment)
+}
 export const levelName = (s: string) => levelRu[s] ?? s
 export const muscleName = (s: string) => muscleRu[s.toLowerCase()] ?? s
