@@ -15,7 +15,9 @@ export type Exercise = {
   model: 'male' | 'female' | 'any'
   difficulty: string
   steps: string[]
-  video: { guid: string; sec: number; res: string } | null
+  /** ar — пропорции кадра (ш/в): бывают квадратные, вертикальные и горизонтальные.
+   *  bg — фон студии у краёв кадра (цвет или CSS-градиент): им заливаем поля, чтобы кадр не обрезался. */
+  video: { guid: string; sec: number; res: string; ar?: number; bg?: string } | null
 }
 
 type VitalFile = { cdn: string; exercises: Exercise[] }
@@ -49,28 +51,55 @@ export function loadExercises(): Promise<void> {
   return loading
 }
 
-// Видео с персонажем своего пола: мужчинам — мужские манекены, женщинам — женские.
-// Домашняя коллекция одна на всех. Пол не указан — показываем всё.
+// Персонаж своего пола: мужчинам — только мужские манекены, женщинам — только женские.
+// Домашняя коллекция (брюнетка) — женская; мужчинам «Дом» собирается из мужских упражнений
+// со своим весом и резинкой. Пол не указан — показываем всё.
 // Пол читается при каждом обращении: анкету могли пройти уже после загрузки приложения.
 const forMe = (e: Exercise) => {
   const gender = loadProfile()?.gender
-  return !gender || e.model === 'any' || e.model === gender
+  if (!gender) return true
+  return e.model === gender || (e.model === 'any' && gender === 'female')
 }
 
-export type Group ={ id: string; name: string; parts: string[] }
+const homeKit = new Set(['body weight', 'resistance band', 'band'])
+const placeOf = (e: Exercise): Exercise['place'] =>
+  e.model === 'male' && homeKit.has(e.equipment) ? 'home' : e.place
+
+export type Group = {
+  id: string
+  name: string
+  parts: string[]
+  /** Отбор внутри группы (например, бицепс внутри «Рук»). */
+  match?: (e: Exercise) => boolean
+  /** Подгруппы: сначала выбираем их, потом список. */
+  subs?: Group[]
+}
+
+const arms = ['upper arms', 'lower arms']
 
 export const groups: Group[] = [
   { id: 'chest', name: 'Грудь', parts: ['chest'] },
   { id: 'back', name: 'Спина', parts: ['back', 'neck'] },
   { id: 'shoulders', name: 'Плечи', parts: ['shoulders'] },
-  { id: 'arms', name: 'Руки', parts: ['upper arms', 'lower arms'] },
+  {
+    id: 'arms',
+    name: 'Руки',
+    parts: arms,
+    subs: [
+      { id: 'biceps', name: 'Бицепс', parts: arms, match: (e) => e.target === 'biceps' },
+      { id: 'triceps', name: 'Трицепс', parts: arms, match: (e) => e.target !== 'biceps' && e.target !== 'forearms' },
+      { id: 'forearms', name: 'Предплечья', parts: arms, match: (e) => e.target === 'forearms' },
+    ],
+  },
   { id: 'legs', name: 'Ноги', parts: ['upper legs', 'lower legs'] },
   { id: 'abs', name: 'Пресс', parts: ['waist'] },
   { id: 'cardio', name: 'Кардио', parts: ['cardio'] },
 ]
 
 export const byGroup = (g: Group, place?: Exercise['place']) =>
-  data.exercises.filter((e) => g.parts.includes(e.bodyPart) && (!place || e.place === place) && forMe(e))
+  data.exercises.filter(
+    (e) => g.parts.includes(e.bodyPart) && (!g.match || g.match(e)) && (!place || placeOf(e) === place) && forMe(e),
+  )
 
 export const videoUrl = (e: Exercise) => (e.video ? `${data.cdn}/${e.video.guid}/play_${e.video.res}.mp4` : '')
 export const posterUrl = (e: Exercise) => (e.video ? `${data.cdn}/${e.video.guid}/thumbnail.jpg` : '')

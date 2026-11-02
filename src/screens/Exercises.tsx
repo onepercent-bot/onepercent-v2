@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { ChevronLeftIcon, ChevronRightIcon } from '../components/Icons'
+import { MuscleIcon, type MuscleZone } from '../components/MuscleIcon'
 import {
   byGroup,
   equipmentName,
@@ -15,6 +16,7 @@ import {
 
 // Раздел «Упражнения»: группа мышц → список → карточка с видео.
 export function Exercises() {
+  const [parent, setParent] = useState<Group | null>(null)
   const [group, setGroup] = useState<Group | null>(null)
   const [exercise, setExercise] = useState<Exercise | null>(null)
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
@@ -28,22 +30,46 @@ export function Exercises() {
 
   if (exercise) return <ExerciseCard exercise={exercise} onBack={() => setExercise(null)} />
   if (group) return <ExerciseList group={group} onBack={() => setGroup(null)} onOpen={setExercise} />
+  if (parent) return <GroupPicker title={parent.name} items={parent.subs!} onBack={() => setParent(null)} onPick={setGroup} />
+
+  return (
+    <GroupPicker
+      title="Упражнения"
+      sub={status === 'loading' ? 'Загружаем упражнения…' : status === 'error' ? 'Не удалось загрузить. Проверьте интернет' : 'Выберите группу мышц'}
+      items={groups}
+      disabled={status !== 'ready'}
+      onPick={(g) => (g.subs ? setParent(g) : setGroup(g))}
+    />
+  )
+}
+
+function GroupPicker({ title, sub = 'Выберите мышцу', items, disabled = false, onBack, onPick }: {
+  title: string
+  sub?: string
+  items: Group[]
+  disabled?: boolean
+  onBack?: () => void
+  onPick: (g: Group) => void
+}) {
 
   return (
     <main className="ex">
-      <header className="ex__head">
-        <h1 className="ex__title">Упражнения</h1>
-        <p className="ex__sub">
-          {status === 'loading' ? 'Загружаем упражнения…' : status === 'error' ? 'Не удалось загрузить. Проверьте интернет' : 'Выберите группу мышц'}
-        </p>
+      <header className={onBack ? 'ex__bar' : 'ex__head'}>
+        {onBack && <Back onBack={onBack} />}
+        <div>
+          <h1 className="ex__title">{title}</h1>
+          <p className="ex__sub">{sub}</p>
+        </div>
       </header>
       <ul className="ex__groups">
-        {groups.map((g) => (
+        {items.map((g) => (
           <li key={g.id}>
-            <button type="button" className="card ex__group tappable" disabled={status !== 'ready'}
-              onClick={() => setGroup(g)}>
+            <button type="button" className="card ex__group tappable" disabled={disabled} onClick={() => onPick(g)}>
+              <span className="ex__icon">
+                <MuscleIcon zone={g.id as MuscleZone} />
+              </span>
               <span className="ex__group-name">{g.name}</span>
-              <span className="ex__group-count">{status === 'ready' ? byGroup(g).length : ''}</span>
+              <span className="ex__group-count">{disabled ? '' : byGroup(g).length}</span>
               <ChevronRightIcon className="ex__go" />
             </button>
           </li>
@@ -95,22 +121,36 @@ function ExerciseList({ group, onBack, onOpen }: { group: Group; onBack: () => v
       <ul className="ex__list">
         {list.map((e) => (
           <li key={e.id}>
-            <button type="button" className="card ex__row tappable" onClick={() => onOpen(e)}>
-              <span className="ex__thumb">
-                {e.video && <img src={posterUrl(e)} alt="" loading="lazy" draggable={false} />}
-              </span>
+            <button type="button" className="card ex__tile tappable" onClick={() => onOpen(e)}>
+              <Frame className="ex__thumb" e={e}>
+                <img src={posterUrl(e)} alt="" loading="lazy" draggable={false} />
+              </Frame>
               <span className="ex__text">
                 <span className="ex__name">{e.name}</span>
                 <span className="ex__meta">
                   {equipmentName(e.equipment)} • {levelName(e.difficulty)}
                 </span>
               </span>
-              <ChevronRightIcon className="ex__go" />
             </button>
           </li>
         ))}
       </ul>
     </main>
+  )
+}
+
+/** Квадратное окно под кадр Vital: кадр любой формы виден целиком, поля залиты фоном студии,
+ *  тонкая тёмная рамка по краю исходника срезана. */
+function Frame({ e, className, children }: { e: Exercise; className: string; children: ReactNode }) {
+  const ar = e.video?.ar ?? 1
+  return (
+    <span className={className} style={{ background: e.video?.bg }}>
+      {e.video && (
+        <span className="ex__frame" style={{ aspectRatio: ar, [ar >= 1 ? 'width' : 'height']: '100%' }}>
+          {children}
+        </span>
+      )}
+    </span>
   )
 }
 
@@ -121,20 +161,18 @@ function ExerciseCard({ exercise: e, onBack }: { exercise: Exercise; onBack: () 
       <header className="ex__bar">
         <Back onBack={onBack} />
       </header>
-      <div className="ex__studio">
-        {e.video && (
-          <video
-            key={e.id}
-            src={videoUrl(e)}
-            poster={posterUrl(e)}
-            autoPlay
-            muted
-            loop
-            playsInline
-            disablePictureInPicture
-          />
-        )}
-      </div>
+      <Frame className="ex__studio" e={e}>
+        <video
+          key={e.id}
+          src={videoUrl(e)}
+          poster={posterUrl(e)}
+          autoPlay
+          muted
+          loop
+          playsInline
+          disablePictureInPicture
+        />
+      </Frame>
       <h1 className="ex__card-title">{e.name}</h1>
       <ul className="ex__tags">
         {muscles.map((m, i) => (
