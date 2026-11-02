@@ -59,83 +59,46 @@
   color: var(--accent);
 }
 
-/* группы мышц */
+/* группы мышц — сетка 2 колонки, нечётная последняя карточка (Кардио) на всю ширину */
 .ex__groups {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+.ex__groups > li.is-wide {
+  grid-column: 1 / -1;
 }
 .ex__group {
   width: 100%;
-  height: 3.25rem;
+  height: 4.75rem;
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0 0.9375rem 0 0.5rem;
+  gap: 0.625rem;
+  padding: 0 0.75rem 0 0.5rem;
   text-align: left;
 }
-/* иконка группы: плашка в стиле кнопки «Назад», силуэт приглушён, зона — акцент Главной */
 .ex__icon {
   flex: none;
-  width: 2.375rem;
-  height: 2.375rem;
-  display: grid;
-  place-items: center;
-  border-radius: 0.6875rem;
-  border: 1px solid var(--border);
-  background: radial-gradient(120% 120% at 50% 20%, #10263a 0%, #08141e 75%);
-  box-shadow: var(--surface-highlight);
+  width: 3.5rem;
+  height: 3.5rem;
+  object-fit: contain;
 }
-.mi {
-  width: 1.75rem;
-  height: 1.75rem;
-  overflow: visible;
+.ex__group-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1875rem;
+  min-width: 0;
 }
-.mi__base {
-  fill: rgba(143, 198, 242, 0.26);
-}
-.mi__limb {
-  fill: none;
-  stroke: rgba(143, 198, 242, 0.26);
-  stroke-width: 3.2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-.mi__hot {
-  fill: var(--accent);
-  filter: drop-shadow(0 0 2px rgba(140, 196, 251, 0.65));
-}
-.mi__hot-limb {
-  fill: none;
-  stroke: var(--accent);
-  stroke-width: 3.2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  filter: drop-shadow(0 0 2px rgba(140, 196, 251, 0.65));
-}
-.mi__cut {
-  fill: none;
-  stroke: #0a1824;
-  stroke-width: 0.9;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-.mi__cut--pulse {
-  stroke-width: 2;
-}
-
 .ex__group-name {
   font-size: 0.8125rem;
-  font-weight: 500;
+  font-weight: 600;
+  line-height: 1rem;
 }
 .ex__group-count {
   font-size: 0.6719rem;
+  line-height: 0.8125rem;
   color: var(--accent-soft);
   font-variant-numeric: tabular-nums;
-  margin-left: auto;
-}
-.ex__group-count + .ex__go {
-  margin-left: 0;
 }
 
 /* список — компактные плитки по 2 в ряд, все одной высоты */
@@ -224,6 +187,15 @@
   height: 102%;
   object-fit: fill;
 }
+/* неквадратный кадр: края мягко растворяются в продолжении фона студии */
+.ex__frame.is-tall {
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 6%, #000 94%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0, #000 6%, #000 94%, transparent 100%);
+}
+.ex__frame.is-wide {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 6%, #000 94%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 6%, #000 94%, transparent 100%);
+}
 
 .ex__card-title {
   margin-top: 1rem;
@@ -292,7 +264,7 @@
 /* переключатель Зал / Дом */
 .ex__seg {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 0.8fr 0.8fr 1.4fr;
   gap: 0.25rem;
   padding: 0.1875rem;
   margin-bottom: 0.75rem;

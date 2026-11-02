@@ -3,7 +3,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from '../components/Icons'
 import { MuscleIcon, type MuscleZone } from '../components/MuscleIcon'
 import {
   byGroup,
-  equipmentName,
+  equipmentOf,
   groups,
   levelName,
   loadExercises,
@@ -12,6 +12,7 @@ import {
   videoUrl,
   type Exercise,
   type Group,
+  type Place,
 } from '../data/exercises'
 
 // Раздел «Упражнения»: группа мышц → список → карточка с видео.
@@ -62,14 +63,14 @@ function GroupPicker({ title, sub = 'Выберите мышцу', items, disabl
         </div>
       </header>
       <ul className="ex__groups">
-        {items.map((g) => (
-          <li key={g.id}>
+        {items.map((g, i) => (
+          <li key={g.id} className={items.length % 2 && i === items.length - 1 ? 'is-wide' : undefined}>
             <button type="button" className="card ex__group tappable" disabled={disabled} onClick={() => onPick(g)}>
-              <span className="ex__icon">
-                <MuscleIcon zone={g.id as MuscleZone} />
+              <MuscleIcon zone={g.id as MuscleZone} className="ex__icon" />
+              <span className="ex__group-text">
+                <span className="ex__group-name">{g.name}</span>
+                <span className="ex__group-count">{disabled ? ' ' : byGroup(g).length}</span>
               </span>
-              <span className="ex__group-name">{g.name}</span>
-              <span className="ex__group-count">{disabled ? '' : byGroup(g).length}</span>
               <ChevronRightIcon className="ex__go" />
             </button>
           </li>
@@ -90,10 +91,11 @@ function Back({ onBack }: { onBack: () => void }) {
 const places = [
   { id: 'gym', name: 'Зал' },
   { id: 'home', name: 'Дом' },
+  { id: 'none', name: 'Без инвентаря' },
 ] as const
 
 function ExerciseList({ group, onBack, onOpen }: { group: Group; onBack: () => void; onOpen: (e: Exercise) => void }) {
-  const [place, setPlace] = useState<Exercise['place']>('gym')
+  const [place, setPlace] = useState<Place>('gym')
   const list = byGroup(group, place)
   return (
     <main className="ex">
@@ -128,7 +130,7 @@ function ExerciseList({ group, onBack, onOpen }: { group: Group; onBack: () => v
               <span className="ex__text">
                 <span className="ex__name">{e.name}</span>
                 <span className="ex__meta">
-                  {equipmentName(e.equipment)} • {levelName(e.difficulty)}
+                  {equipmentOf(e)} • {levelName(e.difficulty)}
                 </span>
               </span>
             </button>
@@ -146,7 +148,10 @@ function Frame({ e, className, children }: { e: Exercise; className: string; chi
   return (
     <span className={className} style={{ background: e.video?.bg }}>
       {e.video && (
-        <span className="ex__frame" style={{ aspectRatio: ar, [ar >= 1 ? 'width' : 'height']: '100%' }}>
+        <span
+          className={`ex__frame${ar > 1.01 ? ' is-wide' : ar < 0.99 ? ' is-tall' : ''}`}
+          style={{ aspectRatio: ar, [ar >= 1 ? 'width' : 'height']: '100%' }}
+        >
           {children}
         </span>
       )}
@@ -180,7 +185,7 @@ function ExerciseCard({ exercise: e, onBack }: { exercise: Exercise; onBack: () 
             {m}
           </li>
         ))}
-        <li className="ex__tag">{equipmentName(e.equipment)}</li>
+        <li className="ex__tag">{equipmentOf(e)}</li>
         <li className="ex__tag">{levelName(e.difficulty)}</li>
       </ul>
       <section className="card ex__steps" aria-label="Техника">
