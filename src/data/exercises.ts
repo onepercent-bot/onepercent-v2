@@ -15,12 +15,14 @@ export type Exercise = {
   collection: 'gym' | 'home'
   /** Снаряды, нужные по описанию Vital (и по кадру видео, где Vital молчит): pullup_bar, bench, box, dumbbell, band… */
   needs: string[]
+  /** Доп. разделы, где упражнение тоже показываем (напр. молотковые сгибания — и в «Предплечьях»). */
+  extra?: string[]
   model: 'male' | 'female' | 'any'
   difficulty: string
   steps: string[]
   /** ar — пропорции кадра (ш/в): бывают квадратные, вертикальные и горизонтальные.
-   *  bg — фон студии у краёв кадра (цвет или CSS-градиент): им заливаем поля, чтобы кадр не обрезался. */
-  video: { guid: string; sec: number; res: string; ar?: number; bg?: string } | null
+   *  pos — где обрезать неквадратный кадр в квадратную плитку (0–100 %, по длинной стороне), чтобы человек и снаряд остались в кадре. */
+  video: { guid: string; sec: number; res: string; ar?: number; pos?: number } | null
 }
 
 type VitalFile = { cdn: string; exercises: Exercise[] }
@@ -98,7 +100,7 @@ export type Group = {
   id: string
   name: string
   parts: string[]
-  /** Отбор внутри группы (например, бицепс внутри «Рук»). */
+  /** parts пустой — любая часть тела. Отбор внутри группы (например, бицепс внутри «Рук»). */
   match?: (e: Exercise) => boolean
   /** Подгруппы: сначала выбираем их, потом список. */
   subs?: Group[]
@@ -117,7 +119,8 @@ export const groups: Group[] = [
     subs: [
       { id: 'biceps', name: 'Бицепс', parts: arms, match: (e) => e.target === 'biceps' },
       { id: 'triceps', name: 'Трицепс', parts: arms, match: (e) => e.target !== 'biceps' && e.target !== 'forearms' },
-      { id: 'forearms', name: 'Предплечья', parts: arms, match: (e) => e.target === 'forearms' },
+      // В Vital всего ~9 упражнений на предплечья — добавляем те, где хват нагружен сильнее всего (поле extra).
+      { id: 'forearms', name: 'Предплечья', parts: [], match: (e) => e.target === 'forearms' || !!e.extra?.includes('forearms') },
     ],
   },
   { id: 'legs', name: 'Ноги', parts: ['upper legs', 'lower legs'] },
@@ -127,7 +130,7 @@ export const groups: Group[] = [
 
 export const byGroup = (g: Group, place?: Place) =>
   data.exercises.filter(
-    (e) => g.parts.includes(e.bodyPart) && (!g.match || g.match(e)) && (!place || placesOf(e).includes(place)) && forMe(e),
+    (e) => (!g.parts.length || g.parts.includes(e.bodyPart)) && (!g.match || g.match(e)) && (!place || placesOf(e).includes(place)) && forMe(e),
   )
 
 export const videoUrl = (e: Exercise) => (e.video ? `${data.cdn}/${e.video.guid}/play_${e.video.res}.mp4` : '')
@@ -155,6 +158,7 @@ const equipmentRu: Record<string, string> = {
   'ab wheel': 'Ролик',
   plate: 'Блин',
   sled: 'Сани',
+  vipr: 'ViPR',
 }
 const levelRu: Record<string, string> = {
   beginner: 'Новичок',

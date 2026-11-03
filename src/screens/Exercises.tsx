@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useState } from 'react'
 import { ChevronLeftIcon, ChevronRightIcon } from '../components/Icons'
 import { MuscleIcon, type MuscleZone } from '../components/MuscleIcon'
 import {
@@ -124,9 +124,7 @@ function ExerciseList({ group, onBack, onOpen }: { group: Group; onBack: () => v
         {list.map((e) => (
           <li key={e.id}>
             <button type="button" className="card ex__tile tappable" onClick={() => onOpen(e)}>
-              <Frame className="ex__thumb" e={e}>
-                <img src={posterUrl(e)} alt="" loading="lazy" draggable={false} />
-              </Frame>
+              <Thumb e={e} />
               <span className="ex__text">
                 <span className="ex__name">{e.name}</span>
                 <span className="ex__meta">
@@ -141,19 +139,21 @@ function ExerciseList({ group, onBack, onOpen }: { group: Group; onBack: () => v
   )
 }
 
-/** Квадратное окно под кадр Vital: кадр любой формы виден целиком, поля залиты фоном студии,
- *  тонкая тёмная рамка по краю исходника срезана. */
-function Frame({ e, className, children }: { e: Exercise; className: string; children: ReactNode }) {
+/** Плитка: квадрат, кадр без искажений обрезан по длинной стороне вокруг человека (video.pos).
+ *  Срезана и тонкая тёмная рамка исходника (1%). В карточке видео показываем целиком. */
+function Thumb({ e }: { e: Exercise }) {
   const ar = e.video?.ar ?? 1
+  const pos = e.video?.pos ?? 50
   return (
-    <span className={className} style={{ background: e.video?.bg }}>
+    <span className="ex__thumb">
       {e.video && (
-        <span
-          className={`ex__frame${ar > 1.01 ? ' is-wide' : ar < 0.99 ? ' is-tall' : ''}`}
-          style={{ aspectRatio: ar, [ar >= 1 ? 'width' : 'height']: '100%' }}
-        >
-          {children}
-        </span>
+        <img
+          src={posterUrl(e)}
+          alt=""
+          loading="lazy"
+          draggable={false}
+          style={{ objectPosition: ar >= 1 ? `${pos}% 50%` : `50% ${pos}%` }}
+        />
       )}
     </span>
   )
@@ -166,18 +166,23 @@ function ExerciseCard({ exercise: e, onBack }: { exercise: Exercise; onBack: () 
       <header className="ex__bar">
         <Back onBack={onBack} />
       </header>
-      <Frame className="ex__studio" e={e}>
-        <video
-          key={e.id}
-          src={videoUrl(e)}
-          poster={posterUrl(e)}
-          autoPlay
-          muted
-          loop
-          playsInline
-          disablePictureInPicture
-        />
-      </Frame>
+      {e.video && (
+        <div
+          className="ex__studio"
+          style={{ aspectRatio: e.video.ar ?? 1, width: `min(100%, calc(62vh * ${e.video.ar ?? 1}))` }}
+        >
+          <video
+            key={e.id}
+            src={videoUrl(e)}
+            poster={posterUrl(e)}
+            autoPlay
+            muted
+            loop
+            playsInline
+            disablePictureInPicture
+          />
+        </div>
+      )}
       <h1 className="ex__card-title">{e.name}</h1>
       <ul className="ex__tags">
         {muscles.map((m, i) => (
