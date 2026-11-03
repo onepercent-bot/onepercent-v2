@@ -119,9 +119,21 @@
   text-align: left;
 }
 .ex__thumb {
+  position: relative;
   width: 100%;
   aspect-ratio: 1;
+  overflow: hidden;
   background: #f4f6f8;
+}
+/* −1% по краям — срезать тонкую рамку исходника */
+.ex__thumb img {
+  position: absolute;
+  top: -1%;
+  left: -1%;
+  display: block;
+  width: 102%;
+  height: 102%;
+  object-fit: cover;
 }
 .ex__text {
   display: flex;
@@ -151,9 +163,10 @@
 }
 
 /* карточка: светлая «студия» под белый фон видео Vital */
+/* карточка: видео в своих пропорциях; высокое — не выше 62% экрана, по центру */
 .ex__studio {
-  display: block;
-  aspect-ratio: 1;
+  position: relative;
+  margin: 0 auto;
   border-radius: var(--radius-card);
   overflow: hidden;
   background: #ffffff;
@@ -161,24 +174,7 @@
     0 0 0 1px rgba(170, 210, 250, 0.18),
     0 0.75rem 2rem var(--glow);
 }
-
-/* кадр в своих пропорциях по центру квадрата; −1% по краям — срезать рамку исходника */
-.ex__thumb,
-.ex__studio {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-.ex__frame {
-  position: relative;
-  display: block;
-  max-width: 100%;
-  max-height: 100%;
-  overflow: hidden;
-}
-.ex__frame img,
-.ex__frame video {
+.ex__studio video {
   position: absolute;
   top: -1%;
   left: -1%;
@@ -186,15 +182,6 @@
   width: 102%;
   height: 102%;
   object-fit: fill;
-}
-/* неквадратный кадр: края мягко растворяются в продолжении фона студии */
-.ex__frame.is-tall {
-  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 6%, #000 94%, transparent 100%);
-  mask-image: linear-gradient(to right, transparent 0, #000 6%, #000 94%, transparent 100%);
-}
-.ex__frame.is-wide {
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 6%, #000 94%, transparent 100%);
-  mask-image: linear-gradient(to bottom, transparent 0, #000 6%, #000 94%, transparent 100%);
 }
 
 .ex__card-title {
