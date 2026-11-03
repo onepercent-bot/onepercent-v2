@@ -30,3 +30,15 @@ export function hapticSelection() {
     // недоступно — не критично
   }
 }
+
+export type TgUser = { first_name?: string; last_name?: string; username?: string; photo_url?: string }
+
+/** Пользователь Telegram (имя, аватар); вне Telegram — null. Свои копии не храним. */
+export function telegramUser(): TgUser | null {
+  try {
+    const tg = (window as unknown as { Telegram?: { WebApp?: { initDataUnsafe?: { user?: TgUser } } } }).Telegram?.WebApp
+    return tg?.initDataUnsafe?.user ?? null
+  } catch {
+    return null
+  }
+}

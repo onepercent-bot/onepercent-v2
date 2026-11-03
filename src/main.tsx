@@ -9,6 +9,7 @@ import './styles/wheel.css'
 import './styles/summit.css'
 import './styles/exercises.css'
 import './styles/progress.css'
+import './styles/profile.css'
 import { initTelegram } from './telegram'
 import { App } from './App'
 
