@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Home } from './screens/Home'
 import { Profile } from './screens/Profile'
 import { Exercises } from './screens/Exercises'
+import { Progress } from './screens/Progress'
 import { Summit } from './screens/Summit'
 import { Welcome } from './screens/Welcome'
 import { Onboarding } from './screens/onboarding/Onboarding'
@@ -13,6 +14,8 @@ type Screen = 'welcome' | 'onboarding' | 'summit' | 'app'
 export function App() {
   const [screen, setScreen] = useState<Screen>(() => (isOnboarded() ? 'app' : 'welcome'))
   const [tab, setTab] = useState<Tab>('home')
+  // группа, которую открыть в «Упражнениях» (переход из «Прогресса»)
+  const [exGroup, setExGroup] = useState<string | undefined>()
   // откуда открыта анкета: «назад» с первого шага возвращает туда же
   const [from, setFrom] = useState<'welcome' | 'profile'>('welcome')
 
@@ -57,8 +60,21 @@ export function App() {
             setFrom('profile')
             setScreen('onboarding')
           }}
-        /> : tab === 'exercises' ? <Exercises /> : <Home />}
-      <BottomNav active={tab === 'analytics' ? 'home' : tab} onSelect={(t) => t !== 'analytics' && setTab(t)} />
+        /> : tab === 'exercises' ? <Exercises initialGroup={exGroup} /> : tab === 'progress' ? (
+          <Progress
+            onOpenGroup={(g) => {
+              setExGroup(g)
+              setTab('exercises')
+            }}
+          />
+        ) : <Home />}
+      <BottomNav
+        active={tab}
+        onSelect={(t) => {
+          setExGroup(undefined)
+          setTab(t)
+        }}
+      />
     </div>
   )
 }
