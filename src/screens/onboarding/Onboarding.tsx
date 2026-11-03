@@ -21,7 +21,7 @@ import { emptyProfile, type Goal, type Level, type Lift, type Place, type Profil
 
 const STEPS = 6
 
-const goals: { id: Goal; title: string; sub: string; icon: ReactNode }[] = [
+export const goals: { id: Goal; title: string; sub: string; icon: ReactNode }[] = [
   { id: 'muscle', title: 'Набрать мышечную массу', sub: 'Больше мышц и объёма', icon: <DumbbellIcon className="ob-i-dumbbell" /> },
   { id: 'fat_loss', title: 'Похудеть и подтянуть тело', sub: 'Меньше жира, плотнее мышцы', icon: <FlameIcon /> },
   { id: 'strength', title: 'Стать сильнее', sub: 'Рост рабочих весов', icon: <BoltIcon className="ob-i-bolt" /> },
@@ -29,13 +29,13 @@ const goals: { id: Goal; title: string; sub: string; icon: ReactNode }[] = [
   { id: 'maintain', title: 'Поддерживать форму', sub: 'Здоровье и тонус', icon: <HeartIcon /> },
 ]
 
-const levels: { id: Level; title: string; sub: string; bars: number }[] = [
+export const levels: { id: Level; title: string; sub: string; bars: number }[] = [
   { id: 'beginner', title: 'Новичок', sub: 'до 6 месяцев', bars: 1 },
   { id: 'intermediate', title: 'Средний', sub: '6 месяцев – 2 года', bars: 2 },
   { id: 'advanced', title: 'Опытный', sub: 'более 2 лет', bars: 3 },
 ]
 
-const places: { id: Place; title: string; sub: string; icon: ReactNode }[] = [
+export const places: { id: Place; title: string; sub: string; icon: ReactNode }[] = [
   { id: 'gym', title: 'Тренажёрный зал', sub: 'Всё оборудование', icon: <GymIcon /> },
   { id: 'home_equipment', title: 'Дома с инвентарём', sub: 'Гантели, турник и т. п.', icon: <DumbbellIcon className="ob-i-dumbbell" /> },
   { id: 'home_bodyweight', title: 'Дома без инвентаря', sub: 'Только вес тела', icon: <BodyIcon /> },
