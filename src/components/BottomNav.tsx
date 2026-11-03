@@ -3,7 +3,7 @@ import { BarsIcon, ExercisesIcon, HomeIcon, UserIcon } from './Icons'
 const items = [
   { id: 'home', label: 'Главная', Icon: HomeIcon },
   { id: 'exercises', label: 'Упражнения', Icon: ExercisesIcon },
-  { id: 'analytics', label: 'Аналитика', Icon: BarsIcon },
+  { id: 'progress', label: 'Прогресс', Icon: BarsIcon },
   { id: 'profile', label: 'Профиль', Icon: UserIcon },
 ] as const
 

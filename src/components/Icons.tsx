@@ -137,3 +137,26 @@ export const PullUpBarIcon = (p: SVGProps<SVGSVGElement>) => (
     <path d="M4 21V5M20 21V5M4 8h16M2.5 5h3M18.5 5h3" />
   </svg>
 )
+
+export const TrophyIcon = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base} {...p}>
+    <path d="M7 3.5h10v5.5a5 5 0 0 1-10 0Z" />
+    <path d="M7 5.5H3.5v1.2A3.8 3.8 0 0 0 7.3 10.5M17 5.5h3.5v1.2a3.8 3.8 0 0 1-3.8 3.8" />
+    <path d="M12 14v3.5M8.5 20.5h7M9.5 17.5h5v3h-5Z" />
+  </svg>
+)
+
+export const BenchIcon = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base} {...p}>
+    <path d="M2 5.5h20M4.5 3.5v4M19.5 3.5v4M6 2.8v5.4M18 2.8v5.4" />
+    <path d="M5 13h14M7 13v7M17 13v7M7 16.5h10M8.5 5.5v7.5M15.5 5.5v7.5" />
+  </svg>
+)
+
+export const TargetIcon = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base} {...p}>
+    <circle cx="12" cy="12" r="9" />
+    <circle cx="12" cy="12" r="4.5" />
+    <circle cx="12" cy="12" r="0.8" fill="currentColor" />
+  </svg>
+)

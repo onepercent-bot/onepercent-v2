@@ -16,9 +16,10 @@ import {
 } from '../data/exercises'
 
 // Раздел «Упражнения»: группа мышц → список → карточка с видео.
-export function Exercises() {
-  const [parent, setParent] = useState<Group | null>(null)
-  const [group, setGroup] = useState<Group | null>(null)
+export function Exercises({ initialGroup }: { initialGroup?: string }) {
+  const start = groups.find((g) => g.id === initialGroup) ?? null
+  const [parent, setParent] = useState<Group | null>(start?.subs ? start : null)
+  const [group, setGroup] = useState<Group | null>(start && !start.subs ? start : null)
   const [exercise, setExercise] = useState<Exercise | null>(null)
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
 
