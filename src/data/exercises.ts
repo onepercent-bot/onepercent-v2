@@ -3,6 +3,8 @@ import { loadProfile } from '../onboarding'
 // Упражнения Vital + видео Bunny. Сам файл данных платный и лежит вне git
 // (src/data/private/vital.json, см. .gitignore). Если его нет — список пустой, сборка не падает.
 
+export type ExerciseKind = 'base' | 'iso' | 'stretch' | 'cardio'
+
 export type Exercise = {
   id: string
   name: string
@@ -18,6 +20,9 @@ export type Exercise = {
   /** Доп. разделы, где упражнение тоже показываем (напр. молотковые сгибания — и в «Предплечьях»). */
   extra?: string[]
   model: 'male' | 'female' | 'any'
+  /** Роль в тренировке: base — базовое (несколько суставов, тяжёлое, ставится первым), iso — изолирующее/лёгкое,
+   *  stretch — растяжка и мобильность, cardio — кардио и прыжки. Сверено вручную по всем 979 (2026-11-04). */
+  kind: ExerciseKind
   difficulty: string
   steps: string[]
   /** ar — пропорции кадра (ш/в): бывают квадратные, вертикальные и горизонтальные.
@@ -132,6 +137,9 @@ export const byGroup = (g: Group, place?: Place) =>
   data.exercises.filter(
     (e) => (!g.parts.length || g.parts.includes(e.bodyPart)) && (!g.match || g.match(e)) && (!place || placesOf(e).includes(place)) && forMe(e),
   )
+
+/** Все упражнения с персонажем своего пола. */
+export const myExercises = () => data.exercises.filter(forMe)
 
 export const videoUrl = (e: Exercise) => (e.video ? `${data.cdn}/${e.video.guid}/play_${e.video.res}.mp4` : '')
 export const posterUrl = (e: Exercise) => (e.video ? `${data.cdn}/${e.video.guid}/thumbnail.jpg` : '')
@@ -268,3 +276,6 @@ export function musclesOf(e: Exercise): string[] {
   }
   return out
 }
+
+const kindRu: Record<ExerciseKind, string> = { base: 'Базовое', iso: 'Изолирующее', stretch: 'Растяжка', cardio: 'Кардио' }
+export const kindName = (k: ExerciseKind) => kindRu[k]

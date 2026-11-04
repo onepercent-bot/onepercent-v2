@@ -160,3 +160,28 @@ export const TargetIcon = (p: SVGProps<SVGSVGElement>) => (
     <circle cx="12" cy="12" r="0.8" fill="currentColor" />
   </svg>
 )
+
+export const TrendUpIcon = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base} strokeWidth={2} {...p}>
+    <path d="M3 17l6-6 4 4 8-8M15 7h6v6" />
+  </svg>
+)
+
+export const SwapIcon = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base} strokeWidth={2} {...p}>
+    <path d="M4 8h14l-3-3M20 16H6l3 3" />
+  </svg>
+)
+
+export const PauseIcon = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base} fill="currentColor" stroke="none" {...p}>
+    <rect x="6" y="5" width="4" height="14" rx="1" />
+    <rect x="14" y="5" width="4" height="14" rx="1" />
+  </svg>
+)
+
+export const PlayIcon = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base} fill="currentColor" stroke="none" {...p}>
+    <path d="M7 4.5v15l12-7.5Z" />
+  </svg>
+)

@@ -1,0 +1,563 @@
+/* «Тренировка дня» и выполнение упражнения. Цвета Главной; второстепенный текст — нейтральный светлый
+   (голубой только для акцентов: прибавка веса, иконки, текущий подход) — решение владельца 2026-11-04. */
+.wo {
+  --text-2: rgba(226, 234, 243, 0.62);
+  --text-3: rgba(226, 234, 243, 0.45);
+  --field: rgba(255, 255, 255, 0.05);
+  --field-border: rgba(255, 255, 255, 0.09);
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.wo-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  padding: 0 1.2875rem 0.75rem 1.4312rem;
+}
+.wo-body::-webkit-scrollbar {
+  display: none;
+}
+.wo-empty {
+  padding: 2rem 1.4312rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: var(--text-2);
+}
+
+.wo-ic {
+  flex: none;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--surface-highlight);
+  color: var(--accent);
+}
+.wo-ic svg {
+  width: 1rem;
+  height: 1rem;
+}
+.wo-ic--txt {
+  width: auto;
+  padding: 0 0.8rem;
+  border-radius: 62rem;
+  font-size: 0.6875rem;
+  color: var(--text-2);
+}
+
+/* заголовок */
+.wo-head {
+  padding: 1rem 1.2875rem 0.85rem 1.4312rem;
+}
+.wo-head .wo-ic {
+  margin-bottom: 0.75rem;
+}
+.wo-eyebrow {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+.wo-h1 {
+  margin-top: 0.25rem;
+  font-size: 1.5rem;
+  line-height: 1.85rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+.wo-meta {
+  margin-top: 0.2rem;
+  font-size: 0.8rem;
+  line-height: 1.1rem;
+  color: var(--text-2);
+}
+
+/* неделя */
+.wo-week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  padding: 0.5rem 0.3rem;
+}
+.wo-d {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0 0.35rem;
+  border-radius: 0.8rem;
+}
+.wo-d b {
+  font-size: 0.6rem;
+  font-weight: 400;
+  color: var(--text-2);
+}
+.wo-dot {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(120, 150, 180, 0.55);
+  color: var(--accent);
+}
+.wo-dot svg {
+  width: 0.7rem;
+  height: 0.7rem;
+}
+.wo-d small {
+  font-size: 0.56rem;
+  color: var(--text-2);
+  white-space: nowrap;
+}
+.wo-d.is-off .wo-dot {
+  opacity: 0.4;
+}
+.wo-d.is-off small {
+  color: var(--text-3);
+}
+.wo-d.is-sel {
+  background: rgba(140, 196, 251, 0.07);
+  box-shadow: inset 0 0 0 1px rgba(175, 210, 245, 0.22);
+}
+.wo-d.is-sel b,
+.wo-d.is-sel small {
+  color: #fff;
+  font-weight: 600;
+}
+.wo-d.is-sel .wo-dot {
+  border-color: rgba(175, 210, 245, 0.7);
+  background: linear-gradient(90deg, #3d5870, #2c4153 50%, #3d5870);
+  box-shadow: 0 0 0.55rem rgba(90, 150, 220, 0.4);
+}
+
+/* тренер */
+.wo-coach {
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.6rem 0.8rem 0.6rem 0.6rem;
+}
+.wo-coach p {
+  flex: 1;
+  font-size: 0.78rem;
+  line-height: 1.05rem;
+  font-weight: 500;
+}
+.wo-coach p span {
+  font-weight: 400;
+  color: var(--text-2);
+}
+.wo-disc {
+  flex: none;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle, #0e1c28 50%, #25394b 100%);
+  box-shadow: inset 0 0 0 1px rgba(150, 195, 240, 0.12);
+  color: var(--accent);
+}
+.wo-disc svg {
+  width: 0.95rem;
+  height: 0.95rem;
+}
+.wo-disc--lg {
+  width: 3.5rem;
+  height: 3.5rem;
+}
+.wo-disc--lg svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+/* список упражнений */
+.wo-list {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.42rem;
+}
+.wo-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.42rem 0.75rem 0.42rem 0.42rem;
+}
+.wo-th {
+  flex: none;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 0.7rem;
+  overflow: hidden;
+  background: #fff;
+}
+.wo-th img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.wo-rt {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.wo-rn {
+  font-size: 0.875rem;
+  line-height: 1.15rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.wo-rx {
+  font-size: 0.75rem;
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+}
+.wo-pill {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.15rem;
+}
+.wo-pill b {
+  padding: 0.32rem 0.65rem;
+  border-radius: 62rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  border: 1px solid var(--field-border);
+  background: var(--field);
+  white-space: nowrap;
+}
+.wo-pill b.is-mute {
+  font-weight: 500;
+  color: var(--text-2);
+}
+.wo-pill i {
+  font-style: normal;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.wo-foot {
+  flex: none;
+  display: flex;
+  gap: 0.55rem;
+  padding: 0.6rem 1.2875rem calc(env(safe-area-inset-bottom, 0px) + 0.9rem) 1.4312rem;
+}
+.wo-foot .cta {
+  flex: 1;
+  margin: 0;
+  height: 2.75rem;
+  font-size: 0.85rem;
+}
+.wo-ghost {
+  flex: none;
+  height: 2.75rem;
+  padding: 0 1.1rem;
+  border-radius: 62rem;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.8rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--surface-highlight);
+}
+.wo-ghost svg {
+  width: 0.95rem;
+  height: 0.95rem;
+  color: var(--accent);
+}
+
+/* выполнение */
+.wo-bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.2875rem 0.6rem 1.4312rem;
+}
+.wo-bar__t {
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+.wo-studio {
+  margin: 0 auto;
+  width: 12.5rem;
+  aspect-ratio: 1;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 0 1.1rem var(--glow);
+}
+.wo-studio video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.wo-tline {
+  margin-top: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.wo-tline > div {
+  flex: 1;
+  min-width: 0;
+}
+.wo-tl {
+  font-size: 1.25rem;
+  line-height: 1.55rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.wo-mus {
+  flex: none;
+  width: 2.6rem;
+  height: 2.6rem;
+}
+.wo-prog {
+  margin-top: 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.55rem 0.8rem 0.55rem 0.6rem;
+}
+.wo-prog p {
+  font-size: 0.78rem;
+  line-height: 1.1rem;
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+}
+.wo-prog b {
+  color: #fff;
+  font-weight: 600;
+}
+.wo-prog em {
+  font-style: normal;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.wo-sets {
+  margin-top: 0.45rem;
+  padding: 0.15rem 0.75rem;
+}
+.wo-sh,
+.wo-sr {
+  display: grid;
+  grid-template-columns: 1.3rem 1.6rem 1fr 1fr 1.7rem;
+  align-items: center;
+  gap: 0.5rem;
+}
+.wo-sh {
+  padding: 0.45rem 0 0.3rem;
+  font-size: 0.65rem;
+  color: var(--text-3);
+}
+.wo-sh span:nth-child(3),
+.wo-sh span:nth-child(4) {
+  text-align: center;
+}
+.wo-sr {
+  height: 2.4rem;
+  border-top: 1px solid rgba(150, 190, 255, 0.08);
+  font-variant-numeric: tabular-nums;
+}
+.wo-sr.is-cur {
+  margin: 0 -0.75rem;
+  padding: 0 0.75rem;
+  background: linear-gradient(90deg, rgba(140, 196, 251, 0.07), rgba(140, 196, 251, 0));
+}
+.wo-st {
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--accent);
+}
+.wo-st svg {
+  width: 0.7rem;
+  height: 0.7rem;
+}
+.wo-st.is-cur {
+  border: 1.5px solid var(--accent);
+  box-shadow: 0 0 0.4rem rgba(140, 196, 251, 0.5);
+}
+.wo-st.is-cur::after {
+  content: '';
+  width: 0.35rem;
+  height: 0.35rem;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.wo-n {
+  font-size: 0.8rem;
+  color: var(--text-2);
+}
+.wo-sr.is-cur .wo-n {
+  color: #fff;
+  font-weight: 600;
+}
+.wo-box {
+  height: 1.85rem;
+  border-radius: 0.55rem;
+  display: grid;
+  place-items: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: 1px solid var(--field-border);
+  background: var(--field);
+}
+.wo-box:disabled {
+  border-color: transparent;
+  background: none;
+  color: rgba(255, 255, 255, 0.78);
+}
+.wo-box.is-act {
+  border-color: rgba(175, 210, 245, 0.6);
+  box-shadow: 0 0 0.45rem rgba(90, 150, 220, 0.3);
+}
+.wo-box.is-emp {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--text-3);
+}
+.wo-box.is-static {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--text-2);
+  border-color: transparent;
+  background: none;
+}
+.wo-ck {
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(120, 150, 180, 0.5);
+  color: transparent;
+}
+.wo-ck svg {
+  width: 0.7rem;
+  height: 0.7rem;
+}
+.wo-ck.is-on {
+  border-color: rgba(175, 210, 245, 0.6);
+  background: linear-gradient(90deg, #3d5870, #2c4153 50%, #3d5870);
+  color: var(--accent);
+}
+.wo-sr.is-cur .wo-ck {
+  border-color: rgba(175, 210, 245, 0.6);
+  color: rgba(140, 196, 251, 0.5);
+}
+
+.wo-rest {
+  margin-top: 0.55rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.65rem 0.75rem 0.65rem 0.8rem;
+}
+.wo-ring {
+  flex: none;
+  width: 2.9rem;
+  height: 2.9rem;
+}
+.wo-ring circle {
+  fill: none;
+  stroke-width: 4;
+}
+.wo-ring__bg {
+  stroke: rgba(140, 196, 251, 0.14);
+}
+.wo-ring__fg {
+  stroke: var(--accent);
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1s linear;
+  filter: drop-shadow(0 0 3px rgba(140, 196, 251, 0.6));
+}
+.wo-rest__t {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.wo-rest__t b {
+  font-size: 0.68rem;
+  font-weight: 400;
+  color: var(--text-2);
+}
+.wo-rest__t span {
+  font-size: 1.3rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.wo-rest__t small {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-2);
+}
+.wo-sq {
+  flex: none;
+  height: 2.1rem;
+  min-width: 2.1rem;
+  padding: 0 0.7rem;
+  border-radius: 62rem;
+  display: grid;
+  place-items: center;
+  font-size: 0.72rem;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+.wo-sq svg {
+  width: 0.85rem;
+  height: 0.85rem;
+  color: var(--accent);
+}
+
+.wo-finish {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0 1.4312rem;
+  text-align: center;
+}
+.wo-finish .wo-h1 {
+  margin-top: 0.75rem;
+}
+.wo-finish .cta {
+  margin-top: 1.25rem;
+  width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wo-ring__fg {
+    transition: none;
+  }
+}

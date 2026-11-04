@@ -8,6 +8,7 @@ import {
   levelName,
   loadExercises,
   musclesOf,
+  kindName,
   posterUrl,
   videoUrl,
   type Exercise,
@@ -189,7 +190,7 @@ function ExerciseCard({ exercise: e, onBack }: { exercise: Exercise; onBack: () 
       )}
       <h1 className="ex__card-title">{e.name}</h1>
       <p className="ex__card-meta">
-        {equipmentOf(e)} · {levelName(e.difficulty)}
+        {kindName(e.kind)} · {equipmentOf(e)} · {levelName(e.difficulty)}
       </p>
       <section className="card ex__mus" aria-label="Работающие мышцы">
         {muscles.map((m, i) => (
