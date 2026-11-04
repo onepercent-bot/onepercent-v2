@@ -3,6 +3,7 @@ import { Home } from './screens/Home'
 import { Profile } from './screens/Profile'
 import { Exercises } from './screens/Exercises'
 import { Progress } from './screens/Progress'
+import { Workout } from './screens/Workout'
 import { Summit } from './screens/Summit'
 import { Welcome } from './screens/Welcome'
 import { Onboarding } from './screens/onboarding/Onboarding'
@@ -18,6 +19,8 @@ export function App() {
   const [exGroup, setExGroup] = useState<string | undefined>()
   // откуда открыта анкета: «назад» с первого шага возвращает туда же
   const [from, setFrom] = useState<'welcome' | 'profile'>('welcome')
+  // «Тренировка дня» поверх вкладок (открывается с Главной)
+  const [workout, setWorkout] = useState(false)
 
   if (screen === 'welcome')
     return (
@@ -53,6 +56,13 @@ export function App() {
     )
   }
 
+  if (workout)
+    return (
+      <div className="app">
+        <Workout onClose={() => setWorkout(false)} />
+      </div>
+    )
+
   return (
     <div className="app">
       {tab === 'profile' ? <Profile
@@ -67,7 +77,7 @@ export function App() {
               setTab('exercises')
             }}
           />
-        ) : <Home />}
+        ) : <Home onWorkout={() => setWorkout(true)} />}
       <BottomNav
         active={tab}
         onSelect={(t) => {

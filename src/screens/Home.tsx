@@ -5,14 +5,14 @@ import { LastWorkout } from '../components/LastWorkout'
 import { ArrowRightIcon } from '../components/Icons'
 import { homeMock } from '../data/home'
 
-export function Home() {
+export function Home({ onWorkout }: { onWorkout?: () => void }) {
   const { muscle, coach, week, last } = homeMock
   return (
     <main className="home">
       <Hero muscle={muscle} />
       <div className="home__body">
-        <Recommended title={coach.title} subtitle={coach.subtitle} />
-        <button type="button" className="cta tappable">
+        <Recommended title={coach.title} subtitle={coach.subtitle} onClick={onWorkout} />
+        <button type="button" className="cta tappable" onClick={onWorkout}>
           Начать тренировку
           <ArrowRightIcon />
         </button>

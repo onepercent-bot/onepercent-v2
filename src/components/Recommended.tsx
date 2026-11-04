@@ -1,8 +1,8 @@
 import { ChevronRightIcon, DumbbellIcon } from './Icons'
 
-export function Recommended({ title, subtitle }: { title: string; subtitle: string }) {
+export function Recommended({ title, subtitle, onClick }: { title: string; subtitle: string; onClick?: () => void }) {
   return (
-    <button type="button" className="card reco tappable">
+    <button type="button" className="card reco tappable" onClick={onClick}>
       <span className="icon-disc reco__icon">
         <DumbbellIcon />
       </span>
