@@ -192,28 +192,55 @@
   letter-spacing: -0.01em;
 }
 
-.ex__tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.375rem;
-  margin-top: 0.625rem;
-}
-.ex__tag {
-  height: 1.5188rem;
-  display: flex;
-  align-items: center;
-  padding: 0 0.625rem;
-  border: 1px solid rgba(140, 180, 225, 0.16);
-  border-radius: 62.4375rem;
-  background: linear-gradient(180deg, rgba(22, 34, 46, 0.92), rgba(8, 15, 23, 0.92));
-  box-shadow: inset 0 1px 0 rgba(200, 225, 255, 0.08);
-  font-size: 0.625rem;
-  font-weight: 500;
+/* мышцы: не больше трёх, по убыванию нагрузки */
+.ex__card-meta {
+  margin-top: 0.25rem;
+  font-size: 0.6875rem;
   color: var(--accent-soft);
 }
-.ex__tag.is-main {
+.ex__mus {
+  margin-top: 0.75rem;
+  padding: 0.25rem 0.9375rem;
+}
+.ex__mus-row {
+  display: grid;
+  grid-template-columns: 1fr auto 5.25rem;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 2.375rem;
+}
+.ex__mus-row + .ex__mus-row {
+  border-top: 1px solid rgba(150, 190, 255, 0.08);
+}
+.ex__mus-name {
+  font-size: 0.7812rem;
+  color: var(--accent-soft);
+}
+.ex__mus-row.is-main .ex__mus-name {
+  font-size: 0.875rem;
+  font-weight: 600;
   color: var(--text);
-  border-color: rgba(175, 210, 245, 0.45);
+}
+.ex__mus-bar {
+  display: flex;
+  gap: 0.1875rem;
+}
+.ex__mus-bar i {
+  width: 1.125rem;
+  height: 0.3125rem;
+  border-radius: 1rem;
+  background: rgba(140, 196, 251, 0.12);
+}
+.ex__mus-bar i.on {
+  background: var(--accent);
+}
+.ex__mus-row:not(.is-main) .ex__mus-bar i.on {
+  opacity: 0.6;
+}
+.ex__mus-role {
+  font-size: 0.625rem;
+  color: var(--accent-soft);
+  text-align: right;
 }
 
 .ex__steps {

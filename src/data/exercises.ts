@@ -253,3 +253,18 @@ export const equipmentOf = (e: Exercise) => {
 }
 export const levelName = (s: string) => levelRu[s] ?? s
 export const muscleName = (s: string) => muscleRu[s.toLowerCase()] ?? s
+
+// Общие слова Vital («руки», «бёдра»), которые не говорят, какая мышца работает.
+const VAGUE = new Set(['upper arms', 'upper legs', 'lower legs', 'lower arms', 'cardio', 'cardiovascular system', 'back', 'waist'])
+
+/** Две мышцы: основная (target) и главная вспомогательная (первая у Vital). */
+export function musclesOf(e: Exercise): string[] {
+  const out: string[] = [muscleName(e.target)]
+  for (const m of e.secondary) {
+    if (out.length === 2) break
+    if (VAGUE.has(m.toLowerCase())) continue
+    const name = muscleName(m)
+    if (!out.includes(name)) out.push(name)
+  }
+  return out
+}
