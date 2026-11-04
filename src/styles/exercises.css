@@ -31,7 +31,7 @@
   margin-top: 0.125rem;
   font-size: 0.6719rem;
   line-height: 0.8125rem;
-  color: var(--accent-soft);
+  color: var(--text-2);
 }
 
 .ex__back {
@@ -97,7 +97,7 @@
 .ex__group-count {
   font-size: 0.6719rem;
   line-height: 0.8125rem;
-  color: var(--accent-soft);
+  color: var(--text-2);
   font-variant-numeric: tabular-nums;
 }
 
@@ -156,7 +156,7 @@
 .ex__meta {
   font-size: 0.5625rem;
   line-height: 0.6875rem;
-  color: var(--accent-soft);
+  color: var(--text-2);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -196,7 +196,7 @@
 .ex__card-meta {
   margin-top: 0.25rem;
   font-size: 0.6875rem;
-  color: var(--accent-soft);
+  color: var(--text-2);
 }
 .ex__mus {
   margin-top: 0.75rem;
@@ -214,7 +214,7 @@
 }
 .ex__mus-name {
   font-size: 0.7812rem;
-  color: var(--accent-soft);
+  color: var(--text-2);
 }
 .ex__mus-row.is-main .ex__mus-name {
   font-size: 0.875rem;
@@ -239,7 +239,7 @@
 }
 .ex__mus-role {
   font-size: 0.625rem;
-  color: var(--accent-soft);
+  color: var(--text-2);
   text-align: right;
 }
 
@@ -292,7 +292,7 @@
   border-radius: 62.4375rem;
   font-size: 0.7188rem;
   font-weight: 500;
-  color: var(--accent-soft);
+  color: var(--text-2);
 }
 .ex__seg-btn span {
   margin-left: 0.25rem;

@@ -1,6 +1,8 @@
 import { useEffect, useId, useMemo, useState, useSyncExternalStore } from 'react'
 import { ArrowRightIcon, BenchIcon, ChevronDownIcon, ChevronRightIcon, TargetIcon, TrophyIcon } from '../components/Icons'
-import { myCharacter } from '../data/character'
+import { myCharacter, type Anchor } from '../data/character'
+
+type Zone = 'chest' | 'back' | 'shoulders' | 'arms' | 'legs' | 'abs'
 import { insight } from '../data/insights'
 import {
   groupName,
@@ -107,18 +109,28 @@ const MAX_MARKS = 3
 
 function BodyMap({ report }: { report: ProgressReport }) {
   const hero = myCharacter()
-  // фиксированный порядок групп: падение показываем так же, как рост, ничего не прячем
-  const shown = order
-    .map((id) => report.groups.find((g) => g.group === id))
-    .filter((g) => !!g)
-    .slice(0, MAX_MARKS)
+  // фиксированный порядок групп: падение показываем так же, как рост, ничего не прячем.
+  // Подписи — по обе стороны фигуры: если все группы с данными на одной стороне, часть переносим на другую
+  // (точка зеркалится на симметричную мышцу).
+  const groups = order.map((id) => report.groups.find((g) => g.group === id)).filter((g) => !!g)
+  const cx = (hero.anchors.back.x + hero.anchors.arms.x) / 2
+  const pool = { l: groups.filter((g) => hero.anchors[g.group as Zone].side === 'l'), r: groups.filter((g) => hero.anchors[g.group as Zone].side === 'r') }
+  const all = [...pool.l, ...pool.r]
+  const shown: { group: GroupId; change: number; a: Anchor }[] = []
+  for (let i = 0; i < Math.min(MAX_MARKS, all.length); i++) {
+    const side: 'l' | 'r' = i % 2 === 0 ? (pool.l.length >= pool.r.length ? 'l' : 'r') : pool.l.length >= pool.r.length ? 'r' : 'l'
+    const own = pool[side].find((g) => !shown.some((x) => x.group === g.group))
+    const g = own ?? all.find((x) => !shown.some((y) => y.group === x.group))!
+    const base = hero.anchors[g.group as Zone]
+    const a = base.side === side ? base : { ...base, side, x: cx + (cx - base.x) * 0.82 }
+    shown.push({ group: g.group, change: g.change, a })
+  }
   const insufficient = report.sessions > 0 && !shown.length
   return (
     <section className="pg-hero" aria-label="Прогресс по группам мышц">
       <img className="pg-hero__art" src={hero.src} alt="" width={hero.w} height={hero.h} draggable={false} />
       <svg className="pg-hero__lines" viewBox={`0 0 ${hero.w} ${hero.h}`} aria-hidden>
-        {shown.map(({ group }) => {
-          const a = hero.anchors[group as keyof typeof hero.anchors]
+        {shown.map(({ group, a }) => {
           const x0 = LX[a.side]
           return (
             <g key={group}>
@@ -128,8 +140,7 @@ function BodyMap({ report }: { report: ProgressReport }) {
           )
         })}
       </svg>
-      {shown.map(({ group, change }) => {
-        const a = hero.anchors[group as keyof typeof hero.anchors]
+      {shown.map(({ group, change, a }) => {
         const style =
           a.side === 'l'
             ? { right: `${(1 - LX.l / hero.w) * 100}%`, top: `${(a.ly / hero.h) * 100}%` }
@@ -196,7 +207,7 @@ function Chart({ report }: { report: ProgressReport }) {
   const delta = last.value - 100
   const bx = Math.min(Math.max(x(last.t), PAD.l + 22), W - 24)
   return (
-    <svg className="pg-chart" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Индекс силы: ${Math.round(last.value)}%`}>
+    <svg className="pg-chart" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Рост силы: ${pct(delta / 100)} от начала периода`}>
       <defs>
         <linearGradient id={gid} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor="#8cc4fb" stopOpacity="0.32" />
@@ -209,7 +220,7 @@ function Chart({ report }: { report: ProgressReport }) {
           <g key={i}>
             <line className="pg-chart__grid" x1={PAD.l} x2={W - PAD.r} y1={y(v)} y2={y(v)} />
             <text className="pg-chart__y" x={PAD.l - 6} y={y(v) + 3}>
-              {Math.round(v)}%
+              {Math.round(v) === 100 ? 'старт' : `${v > 100 ? '+' : '−'}${Math.abs(Math.round(v - 100))}%`}
             </text>
           </g>
         )

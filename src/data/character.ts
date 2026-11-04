@@ -21,7 +21,7 @@ const characters: Record<'male' | 'female', Character> = {
     anchors: {
       chest: { x: 372, y: 318, side: 'l', ly: 262 },
       back: { x: 312, y: 405, side: 'l', ly: 410 },
-      legs: { x: 338, y: 770, side: 'l', ly: 600 },
+      legs: { x: 330, y: 640, side: 'l', ly: 600 },
       shoulders: { x: 572, y: 300, side: 'r', ly: 230 },
       arms: { x: 594, y: 400, side: 'r', ly: 380 },
       abs: { x: 448, y: 470, side: 'r', ly: 520 },
