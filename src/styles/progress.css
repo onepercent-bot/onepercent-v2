@@ -79,8 +79,8 @@
   color: var(--text);
 }
 .pg-mark__val {
-  font-size: 1.25rem;
-  line-height: 1.5rem;
+  font-size: 0.9375rem;
+  line-height: 1.15rem;
   font-weight: 700;
   letter-spacing: -0.01em;
   color: var(--accent);
@@ -115,7 +115,7 @@
   font-size: 0.625rem;
   font-weight: 400;
   line-height: 0.8125rem;
-  color: var(--accent-soft);
+  color: var(--text-2);
 }
 
 .pg__body {
@@ -143,13 +143,13 @@
   margin-top: 0.125rem;
   font-size: 0.6875rem;
   line-height: 0.875rem;
-  color: var(--accent-soft);
+  color: var(--text-2);
 }
 .pg-str__empty {
   margin: 0.625rem 0 0.375rem;
   font-size: 0.6562rem;
   line-height: 0.9375rem;
-  color: var(--accent-soft);
+  color: var(--text-2);
   opacity: 0.85;
 }
 .pg-chart {
@@ -165,7 +165,7 @@
 }
 .pg-chart__y,
 .pg-chart__x {
-  fill: var(--accent-soft);
+  fill: var(--text-2);
   font-size: 9px;
   font-variant-numeric: tabular-nums;
 }
@@ -223,7 +223,7 @@
 .pg-rec__sub {
   font-size: 0.5938rem;
   line-height: 0.8125rem;
-  color: var(--accent-soft);
+  color: var(--text-2);
 }
 .pg-rec__chev {
   margin-left: auto;
@@ -295,7 +295,7 @@
 .pg-rec__none {
   padding: 0 0.875rem 0.75rem 2.875rem;
   font-size: 0.6875rem;
-  color: var(--accent-soft);
+  color: var(--text-2);
 }
 .pg-rec__list {
   padding: 0 0.625rem 0.375rem;
@@ -334,7 +334,7 @@
 }
 .pg-rec__row:disabled .pg-rec__val {
   font-weight: 400;
-  color: var(--accent-soft);
+  color: var(--text-2);
   opacity: 0.7;
 }
 .pg-rec__go {
@@ -364,7 +364,7 @@
 .pg-tip__body {
   font-size: 0.6875rem;
   line-height: 0.9688rem;
-  color: var(--accent-soft);
+  color: var(--text-2);
 }
 
 /* подробности рекорда — шторка снизу */
@@ -420,7 +420,7 @@
   margin-top: 0.25rem;
   font-size: 0.625rem;
   line-height: 0.8125rem;
-  color: var(--accent-soft);
+  color: var(--text-2);
 }
 .pg-sheet__list {
   margin-top: 0.75rem;
@@ -453,7 +453,7 @@
 .pg-pr__meta {
   font-size: 0.625rem;
   line-height: 0.8125rem;
-  color: var(--accent-soft);
+  color: var(--text-2);
 }
 .pg-pr__meta b {
   font-weight: 600;
@@ -499,7 +499,7 @@
   margin-top: 0.375rem;
   font-size: 0.6875rem;
   line-height: 0.9688rem;
-  color: var(--accent-soft);
+  color: var(--text-2);
 }
 .pg-start__cta {
   width: 100%;
@@ -516,7 +516,7 @@
 .pg-rec__ex {
   font-size: 0.5938rem;
   line-height: 0.75rem;
-  color: var(--accent-soft);
+  color: var(--text-2);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

@@ -114,7 +114,7 @@
   place-items: center;
   font-size: 1.1875rem;
   font-variant-numeric: tabular-nums;
-  color: color-mix(in srgb, var(--accent-soft) 30%, transparent);
+  color: color-mix(in srgb, var(--text-2) 30%, transparent);
   transition: color 120ms, font-size 120ms;
 }
 .wheel__item.d0 {
@@ -124,10 +124,10 @@
 }
 .wheel__item.d1 {
   font-size: 1.3125rem;
-  color: color-mix(in srgb, var(--accent-soft) 75%, transparent);
+  color: color-mix(in srgb, var(--text-2) 75%, transparent);
 }
 .wheel__item.d2 {
-  color: color-mix(in srgb, var(--accent-soft) 45%, transparent);
+  color: color-mix(in srgb, var(--text-2) 45%, transparent);
 }
 .wheel-sheet__done {
   width: 100%;

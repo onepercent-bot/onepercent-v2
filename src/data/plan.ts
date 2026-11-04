@@ -47,7 +47,7 @@ const T: Record<string, Template> = {
   fullB: { title: 'Всё тело', base: ['hips', 'back', 'shoulders', 'quads'], iso: ['chest', 'abs', 'triceps', 'biceps'] },
   fullC: { title: 'Всё тело', base: ['quads', 'back', 'chest', 'hips'], iso: ['shoulders', 'abs', 'calves', 'biceps'] },
   upper: { title: 'Верх тела', base: ['chest', 'back', 'shoulders', 'back'], iso: ['biceps', 'triceps', 'shoulders', 'abs'] },
-  lower: { title: 'Ноги и пресс', base: ['quads', 'hips', 'quads', 'hips'], iso: ['hips', 'calves', 'abs', 'quads'] },
+  lower: { title: 'Ноги и пресс', base: ['quads', 'hips', 'quads', 'hips'], iso: ['abs', 'hips', 'calves', 'quads'] },
   push: { title: 'Грудь и трицепс', base: ['chest', 'chest', 'shoulders', 'triceps'], iso: ['triceps', 'chest', 'shoulders', 'triceps'] },
   pull: { title: 'Спина и бицепс', base: ['back', 'back', 'back', 'back'], iso: ['biceps', 'back', 'biceps', 'abs'] },
   legs: { title: 'Ноги', base: ['quads', 'hips', 'quads', 'hips'], iso: ['hips', 'calves', 'quads', 'abs'] },
@@ -163,6 +163,20 @@ function meta(): Meta {
 // Одно и то же упражнение под разными названиями коллекций: «Классические отжимания» = «Отжимания».
 const same = (name: string) => name.toLowerCase().replace(/^классические |, вариант \d+$|^стандартные /g, '')
 
+// Семейства движений — не больше одного упражнения из семейства в тренировке.
+const PATTERNS: [string, RegExp][] = [
+  ['deadlift', /deadlift|good morning|rdl|stiff/i],
+  ['squat', /squat|leg press|hack/i],
+  ['lunge', /lunge|split|step.?up|step down|reverse step|drop step/i],
+  ['bench', /bench press|chest press|floor press/i],
+  ['overhead', /overhead press|shoulder press|military|arnold|push press/i],
+  ['pullup', /pull.?up|chin.?up|pulldown/i],
+  ['row', /row/i],
+  ['hipthrust', /hip thrust|glute bridge|glute drive/i],
+  ['calf', /calf/i],
+]
+const patternOf = (e: Exercise) => PATTERNS.find(([, re]) => re.test(e.nameEn))?.[0] ?? null
+
 const hash = (s: string) => {
   let h = 2166136261
   for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619)
@@ -269,10 +283,12 @@ export function weekPlan(p: Profile, history: Workout[] = getWorkouts(), at = ne
   days.forEach((day, i) => {
     const t = tpl[i % tpl.length]
     const used = new Set<string>()
+    // одно движение — один раз за тренировку: не три становых подряд
+    const usedPattern = new Set<string>()
     const pick = (slot: Slot, kind: 'base' | 'iso', salt: string): { e: Exercise; alts: Exercise[] } | null => {
       const cands = (k: 'base' | 'iso') =>
         pool
-          .filter((e) => e.kind === k && inSlot[slot](e) && !used.has(same(e.name)))
+          .filter((e) => e.kind === k && inSlot[slot](e) && !used.has(same(e.name)) && !(patternOf(e) && usedPattern.has(patternOf(e)!)))
           .sort((a, b) => score(b, p) - score(a, p) || hash(`${seed}:${i}:${salt}:${a.id}`) - hash(`${seed}:${i}:${salt}:${b.id}`))
       let list = cands(kind)
       if (!list.length) list = cands(kind === 'base' ? 'iso' : 'base')
@@ -282,6 +298,8 @@ export function weekPlan(p: Profile, history: Workout[] = getWorkouts(), at = ne
       const e = top[hash(`${seed}:${i}:${salt}`) % top.length]
       list = [e, ...list.filter((x) => x !== e)]
       used.add(same(e.name))
+      const pt = patternOf(e)
+      if (pt) usedPattern.add(pt)
       return { e, alts: list.slice(1, 6) }
     }
     const isoSlots = [...prio.filter((s) => t.base.includes(s) || t.iso.includes(s) || t.title === 'Всё тело'), ...t.iso]
@@ -298,8 +316,8 @@ export function weekPlan(p: Profile, history: Workout[] = getWorkouts(), at = ne
     }
     // базовые — первыми, изолирующие — добивка
     chosen.sort((a, b) => (a.e.kind === b.e.kind ? 0 : a.e.kind === 'base' ? -1 : 1))
-    const items = chosen.map(({ e, alts, kind }) => {
-      const rx = rxFor(p, e.kind === 'base' ? 'base' : kind, deload)
+    const items = chosen.map(({ e, alts }) => {
+      const rx = rxFor(p, e.kind === 'base' ? 'base' : 'iso', deload)
       return { exercise: e, alts, rx, ...dose(e, rx, p, history, deload), rest: e.kind === 'base' ? 120 : 75 }
     })
     plan[day] = { day, title: t.title, items }
