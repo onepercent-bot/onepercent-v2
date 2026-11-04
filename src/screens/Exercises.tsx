@@ -7,7 +7,7 @@ import {
   groups,
   levelName,
   loadExercises,
-  muscleName,
+  musclesOf,
   posterUrl,
   videoUrl,
   type Exercise,
@@ -160,8 +160,11 @@ function Thumb({ e }: { e: Exercise }) {
   )
 }
 
+// Основная мышца и одна помогающая — человек сразу видит, что работает сильнее.
+const loadRole = ['Основная', 'Помогает']
+
 function ExerciseCard({ exercise: e, onBack }: { exercise: Exercise; onBack: () => void }) {
-  const muscles = [...new Set([e.target, ...e.secondary].map(muscleName))]
+  const muscles = musclesOf(e)
   return (
     <main className="ex">
       <header className="ex__bar">
@@ -185,15 +188,22 @@ function ExerciseCard({ exercise: e, onBack }: { exercise: Exercise; onBack: () 
         </div>
       )}
       <h1 className="ex__card-title">{e.name}</h1>
-      <ul className="ex__tags">
+      <p className="ex__card-meta">
+        {equipmentOf(e)} · {levelName(e.difficulty)}
+      </p>
+      <section className="card ex__mus" aria-label="Работающие мышцы">
         {muscles.map((m, i) => (
-          <li key={m} className={`ex__tag${i === 0 ? ' is-main' : ''}`}>
-            {m}
-          </li>
+          <div key={m} className={`ex__mus-row${i === 0 ? ' is-main' : ''}`}>
+            <span className="ex__mus-name">{m}</span>
+            <span className="ex__mus-bar" aria-hidden>
+              {[0, 1].map((k) => (
+                <i key={k} className={k < 2 - i ? 'on' : undefined} />
+              ))}
+            </span>
+            <span className="ex__mus-role">{loadRole[i]}</span>
+          </div>
         ))}
-        <li className="ex__tag">{equipmentOf(e)}</li>
-        <li className="ex__tag">{levelName(e.difficulty)}</li>
-      </ul>
+      </section>
       <section className="card ex__steps" aria-label="Техника">
         <h2 className="ex__steps-title">Техника</h2>
         <ol>
