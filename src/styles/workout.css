@@ -186,6 +186,9 @@
   gap: 0.42rem;
 }
 .wo-row {
+  width: 100%;
+  text-align: left;
+  color: inherit;
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -300,8 +303,8 @@
 }
 .wo-studio {
   margin: 0 auto;
-  width: 12.5rem;
-  aspect-ratio: 1;
+  height: 13.75rem; /* 220px при ширине 390 — видео видно, таблица подходов целиком на экране */
+  max-width: 100%;
   border-radius: var(--radius-card);
   overflow: hidden;
   background: #fff;

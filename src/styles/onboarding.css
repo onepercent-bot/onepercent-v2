@@ -3,7 +3,7 @@
   --u: calc(min(100vw, 480px) / 390);
   --ob-line: rgba(120, 165, 210, 0.42);
   --ob-line-soft: rgba(120, 165, 210, 0.22);
-  --ob-muted: rgba(235, 241, 248, 0.62);
+  --ob-muted: var(--text-3);
   --ob-accent: #74bff2;
   --ob-icon: #9fd2fb;
   --ob-ease: cubic-bezier(0.23, 1, 0.32, 1);
@@ -14,8 +14,9 @@
   flex-direction: column;
   overflow: hidden;
   color: #fff;
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', system-ui, sans-serif;
+  font-family: var(--font);
   background:
+    linear-gradient(180deg, var(--bg) 0, transparent calc(var(--u) * 110)),
     radial-gradient(120% 60% at 50% 0%, rgba(30, 70, 120, 0.25), transparent 70%),
     linear-gradient(180deg, rgba(1, 7, 14, 0.15) 0%, rgba(1, 7, 14, 0.85) 45%, #01070e 70%),
     url('../assets/welcome-top.png') top center / 100% 100% no-repeat,
@@ -66,7 +67,7 @@
   min-width: calc(var(--u) * 46);
   text-align: right;
   font-size: calc(var(--u) * 12);
-  color: var(--ob-accent);
+  color: var(--text-2);
 }
 
 /* контент шага */
@@ -138,7 +139,7 @@
   text-align: center;
   font-size: calc(var(--u) * 12);
   line-height: calc(var(--u) * 16);
-  color: var(--ob-accent);
+  color: var(--text-2);
 }
 .ob__cta {
   width: 100%;
@@ -231,7 +232,7 @@
 .ob-opt__sub {
   font-size: calc(var(--u) * 12);
   line-height: calc(var(--u) * 16);
-  color: var(--ob-accent);
+  color: var(--text-2);
 }
 .ob-ibox {
   flex: none;
@@ -459,7 +460,7 @@
   align-items: center;
   gap: calc(var(--u) * 7);
   font-size: calc(var(--u) * 12);
-  color: #84b1db;
+  color: var(--text-2);
 }
 .ob-day__dot {
   width: calc(var(--u) * 34);
@@ -718,4 +719,17 @@
 
 .ob-notes textarea {
   font-size: max(16px, calc(var(--u) * 14));
+}
+
+/* метка «главная» у первой выбранной цели */
+.ob-opt__tag {
+  margin-left: calc(var(--u) * 8);
+  padding: calc(var(--u) * 1) calc(var(--u) * 7);
+  border: 1px solid rgba(140, 180, 225, 0.16);
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(22, 34, 46, 0.92), rgba(8, 15, 23, 0.92));
+  font-size: calc(var(--u) * 10.5);
+  line-height: calc(var(--u) * 15);
+  color: var(--text-2);
+  vertical-align: middle;
 }

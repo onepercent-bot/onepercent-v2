@@ -164,7 +164,7 @@ function Thumb({ e }: { e: Exercise }) {
 // Основная мышца и одна помогающая — человек сразу видит, что работает сильнее.
 const loadRole = ['Основная', 'Помогает']
 
-function ExerciseCard({ exercise: e, onBack }: { exercise: Exercise; onBack: () => void }) {
+export function ExerciseCard({ exercise: e, onBack }: { exercise: Exercise; onBack: () => void }) {
   const muscles = musclesOf(e)
   return (
     <main className="ex">

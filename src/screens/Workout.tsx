@@ -11,6 +11,7 @@ import {
 } from '../components/Icons'
 import { MuscleIcon, type MuscleZone } from '../components/MuscleIcon'
 import { NumericWheelPicker } from '../components/NumericWheelPicker'
+import { ExerciseCard } from './Exercises'
 import { loadExercises, posterUrl, videoUrl, type Exercise } from '../data/exercises'
 import { itemFor, todayIndex, weekPlan, type PlanDay, type PlanItem, type WeekPlan } from '../data/plan'
 import { getWorkouts, saveWorkout, subscribeWorkouts, type SetLog } from '../data/workouts'
@@ -20,7 +21,6 @@ import { loadProfile, type Profile } from '../onboarding'
 // Базовые всегда первыми, изолирующие — добивка. Сохранение → saveWorkout() → «Прогресс» пересчитывается сам.
 
 const DAYS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
-const DAYS_FULL = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье']
 const short: Record<string, string> = {
   'Грудь и трицепс': 'Грудь',
   'Спина и бицепс': 'Спина',
@@ -94,6 +94,9 @@ function Day({ plan, selected, onSelect, onStart, onClose }: {
   }, [history, today])
   const next = plan.days.findIndex((d, i) => d && i > today)
   const tip = day ? coachTip(day.items) : null
+  const [open, setOpen] = useState<Exercise | null>(null)
+
+  if (open) return <ExerciseCard exercise={open} onBack={() => setOpen(null)} />
 
   return (
     <main className="wo">
@@ -102,7 +105,7 @@ function Day({ plan, selected, onSelect, onStart, onClose }: {
           <ChevronLeftIcon />
         </button>
         <p className="wo-eyebrow">
-          {DAYS_FULL[selected].toUpperCase()} · НЕДЕЛЯ {plan.week} ИЗ 4{plan.deload ? ' · ЛЁГКАЯ' : ''}
+          НЕДЕЛЯ {plan.week} ИЗ 4{plan.deload ? ' · ЛЁГКАЯ' : ''}
         </p>
         <h1 className="wo-h1">{day ? day.title : 'День отдыха'}</h1>
         <p className="wo-meta">
@@ -140,19 +143,21 @@ function Day({ plan, selected, onSelect, onStart, onClose }: {
         {day && (
           <ul className="wo-list">
             {day.items.map((it) => (
-              <li key={it.exercise.id} className="card wo-row">
-                <Thumb e={it.exercise} />
-                <span className="wo-rt">
-                  <span className="wo-rn">{it.exercise.name}</span>
-                  <span className="wo-rx">
-                    {it.rx.sets} × {it.rx.min}–{it.rx.max}
-                    {it.exercise.kind === 'base' ? ' · базовое' : ''}
+              <li key={it.exercise.id}>
+                <button type="button" className="card wo-row tappable" onClick={() => setOpen(it.exercise)}>
+                  <Thumb e={it.exercise} />
+                  <span className="wo-rt">
+                    <span className="wo-rn">{it.exercise.name}</span>
+                    <span className="wo-rx">
+                      {it.rx.sets} × {it.rx.min}–{it.rx.max}
+                      {it.exercise.kind === 'base' ? ' · базовое' : ''}
+                    </span>
                   </span>
-                </span>
-                <span className="wo-pill">
-                  <b className={it.kg === null ? 'is-mute' : ''}>{it.kg !== null ? kg(it.kg) : it.bodyweight ? 'свой вес' : 'подбор'}</b>
-                  {it.change && it.change !== 'подбор' && <i>{it.change}</i>}
-                </span>
+                  <span className="wo-pill">
+                    <b className={it.kg === null ? 'is-mute' : ''}>{it.kg !== null ? kg(it.kg) : it.bodyweight ? 'свой вес' : 'подбор'}</b>
+                    {it.change && it.change !== 'подбор' && <i>{it.change}</i>}
+                  </span>
+                </button>
               </li>
             ))}
           </ul>
@@ -301,7 +306,7 @@ function Session({ day, profile, deload, onExit, onDone }: {
       </header>
 
       <div className="wo-body wo-body--s">
-        <div className="wo-studio">
+        <div className="wo-studio" style={{ aspectRatio: it.exercise.video?.ar ?? 1 }}>
           {it.exercise.video && (
             <video key={it.exercise.id} src={videoUrl(it.exercise)} poster={posterUrl(it.exercise)} autoPlay muted loop playsInline disablePictureInPicture />
           )}
@@ -310,7 +315,7 @@ function Session({ day, profile, deload, onExit, onDone }: {
           <div>
             <h1 className="wo-tl">{it.exercise.name}</h1>
             <p className="wo-meta">
-              {it.rx.sets} подхода × {it.rx.min}–{it.rx.max} повторений
+              {it.rx.sets} × {it.rx.min}–{it.rx.max} повторений
             </p>
           </div>
           <MuscleIcon zone={zoneOf(it.exercise)} className="wo-mus" />
@@ -320,16 +325,11 @@ function Session({ day, profile, deload, onExit, onDone }: {
           <span className="wo-disc"><TrendUpIcon /></span>
           {prev ? (
             <p>
-              Прошлый раз: <b>{prev}</b>
-              <br />
-              Сегодня: <b>{it.kg !== null ? kg(it.kg) : it.bodyweight ? 'свой вес' : 'подбор'}</b> {it.change && <em>{it.change}</em>}
+              Было <b>{prev}</b> · сегодня <b>{it.kg !== null ? kg(it.kg) : it.bodyweight ? 'свой вес' : 'подбор'}</b> {it.change && <em>{it.change}</em>}
             </p>
           ) : (
             <p>
-              <b>{it.bodyweight ? 'Свой вес.' : 'Подберите вес'}</b>{' '}
-              {it.bodyweight
-                ? `Сделайте ${it.rx.min}–${it.rx.max} повторений чисто, без рывков.`
-                : `на ${it.rx.min}–${it.rx.max} повторений: последние 1–2 — тяжело, но чисто.`}
+              {it.bodyweight ? <><b>Свой вес</b> — чисто, без рывков</> : <><b>Подберите вес</b> — последние 1–2 повтора тяжело</>}
             </p>
           )}
         </div>

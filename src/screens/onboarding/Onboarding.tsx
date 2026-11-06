@@ -151,13 +151,16 @@ function Head({ title, lead }: { title: string; lead: string }) {
   )
 }
 
-function Option({ selected, onClick, icon, title, sub, className = '' }: { selected: boolean; onClick: () => void; icon: ReactNode; title: string; sub: string; className?: string }) {
+function Option({ selected, onClick, icon, title, sub, tag, className = '' }: { selected: boolean; onClick: () => void; icon: ReactNode; title: string; sub: string; tag?: string; className?: string }) {
   return (
     <button type="button" className={`ob-card ob-opt ${className}${selected ? ' sel' : ''}`} aria-pressed={selected} onClick={onClick}>
       {icon}
       <span className="ob-opt__text">
         <span className="ob-opt__title">{title}</span>
-        <span className="ob-opt__sub">{sub}</span>
+        <span className="ob-opt__sub">
+          {sub}
+          {tag && <span className="ob-opt__tag">{tag}</span>}
+        </span>
       </span>
       <span className="ob-radio" />
     </button>
@@ -229,11 +232,28 @@ function StepAbout({ p, set }: StepProps) {
 function StepGoal({ p, set }: StepProps) {
   return (
     <>
-      <Head title="Твоя цель" lead="Выберите главную — под неё строится вся программа." />
+      <Head title="Твоя цель" lead="Можно выбрать несколько — первая станет главной." />
       <div className="ob__body">
-        {goals.map((g) => (
-          <Option key={g.id} selected={p.goal === g.id} onClick={() => set('goal', g.id)} icon={<span className="ob-ibox">{g.icon}</span>} title={g.title} sub={g.sub} />
-        ))}
+        {goals.map((g) => {
+          const chosen = p.goals ?? (p.goal ? [p.goal] : [])
+          const on = chosen.includes(g.id)
+          const toggle = () => {
+            const next = on ? chosen.filter((x) => x !== g.id) : [...chosen, g.id]
+            set('goals', next)
+            set('goal', next[0] ?? null)
+          }
+          return (
+            <Option
+              key={g.id}
+              selected={on}
+              onClick={toggle}
+              icon={<span className="ob-ibox">{g.icon}</span>}
+              title={g.title}
+              sub={g.sub}
+              tag={on && chosen.length > 1 && chosen[0] === g.id ? 'главная' : undefined}
+            />
+          )
+        })}
       </div>
     </>
   )
