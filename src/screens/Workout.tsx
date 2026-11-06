@@ -198,6 +198,29 @@ function Thumb({ e }: { e: Exercise }) {
   )
 }
 
+/** Видео упражнения: широкий кадр — на всю ширину, квадратный и вертикальный — квадрат с обрезкой вокруг человека (как плитка). */
+function Studio({ e }: { e: Exercise }) {
+  if (!e.video) return null
+  const ar = e.video.ar ?? 1
+  const wide = ar > 1.2
+  const pos = e.video.pos ?? 50
+  return (
+    <div className={`wo-studio${wide ? ' is-wide' : ''}`} style={wide ? { aspectRatio: ar } : undefined}>
+      <video
+        key={e.id}
+        src={videoUrl(e)}
+        poster={posterUrl(e)}
+        autoPlay
+        muted
+        loop
+        playsInline
+        disablePictureInPicture
+        style={{ objectPosition: ar >= 1 ? `${pos}% 50%` : `50% ${pos}%` }}
+      />
+    </div>
+  )
+}
+
 /* ───────── выполнение ───────── */
 
 type LogSet = { kg: number | null; reps: number | null; done: boolean }
@@ -306,11 +329,7 @@ function Session({ day, profile, deload, onExit, onDone }: {
       </header>
 
       <div className="wo-body wo-body--s">
-        <div className="wo-studio" style={{ aspectRatio: it.exercise.video?.ar ?? 1 }}>
-          {it.exercise.video && (
-            <video key={it.exercise.id} src={videoUrl(it.exercise)} poster={posterUrl(it.exercise)} autoPlay muted loop playsInline disablePictureInPicture />
-          )}
-        </div>
+        <Studio e={it.exercise} />
         <div className="wo-tline">
           <div>
             <h1 className="wo-tl">{it.exercise.name}</h1>
