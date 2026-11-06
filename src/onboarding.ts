@@ -14,7 +14,10 @@ export type Profile = {
   height: number | null
   weight: number | null
   targetWeight: number | null
+  /** Главная цель (первая выбранная) — по ней строится программа. */
   goal: Goal | null
+  /** Все выбранные цели по порядку выбора; первая = goal. Старые анкеты — без поля. */
+  goals?: Goal[]
   level: Level | null
   place: Place | null
   equipment: string[]
@@ -36,6 +39,7 @@ export const emptyProfile: Profile = {
   weight: null,
   targetWeight: null,
   goal: null,
+  goals: [],
   level: null,
   place: null,
   equipment: [],

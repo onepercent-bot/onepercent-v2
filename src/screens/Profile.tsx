@@ -149,7 +149,7 @@ function ProgramCard({ p, onLift }: { p: ProfileData; onLift: (l: Lift) => void 
         <h2 className="pf-card__title">Моя программа</h2>
         <span className="pf-card__meta">по ней тренер строит тренировки</span>
       </div>
-      <Row k="Цель" v={goals.find((g) => g.id === p.goal)?.title} />
+      <Row k="Цель" v={(p.goals?.length ? p.goals : p.goal ? [p.goal] : []).map((id) => goals.find((g) => g.id === id)?.title).filter(Boolean).join(', ') || undefined} />
       <Row k="Уровень" v={levels.find((l) => l.id === p.level)?.title} />
       <Row k="Где тренируюсь" v={[place, p.equipment.length ? p.equipment.join(', ') : ''].filter(Boolean).join(' · ')} />
       <Row k="График" v={p.perWeek ? `${p.perWeek} в неделю${days ? ` · ${days}` : ''}` : undefined} />
