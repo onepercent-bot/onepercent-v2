@@ -198,14 +198,13 @@ function Thumb({ e }: { e: Exercise }) {
   )
 }
 
-/** Видео упражнения: широкий кадр — на всю ширину, квадратный и вертикальный — квадрат с обрезкой вокруг человека (как плитка). */
+/** Видео упражнения: квадрат, кадр обрезан по длинной стороне вокруг человека (как плитка). */
 function Studio({ e }: { e: Exercise }) {
   if (!e.video) return null
   const ar = e.video.ar ?? 1
-  const wide = ar > 1.2
   const pos = e.video.pos ?? 50
   return (
-    <div className={`wo-studio${wide ? ' is-wide' : ''}`} style={wide ? { aspectRatio: ar } : undefined}>
+    <div className="wo-studio">
       <video
         key={e.id}
         src={videoUrl(e)}

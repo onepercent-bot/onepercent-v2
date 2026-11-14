@@ -311,9 +311,6 @@
   background: #fff;
   box-shadow: 0 0 1.1rem var(--glow);
 }
-.wo-studio.is-wide {
-  width: 100%;
-}
 .wo-studio video {
   width: 100%;
   height: 100%;

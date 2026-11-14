@@ -172,10 +172,7 @@ export function ExerciseCard({ exercise: e, onBack }: { exercise: Exercise; onBa
         <Back onBack={onBack} />
       </header>
       {e.video && (
-        <div
-          className="ex__studio"
-          style={{ aspectRatio: e.video.ar ?? 1, width: `min(100%, calc(62vh * ${e.video.ar ?? 1}))` }}
-        >
+        <div className="ex__studio">
           <video
             key={e.id}
             src={videoUrl(e)}
@@ -185,6 +182,7 @@ export function ExerciseCard({ exercise: e, onBack }: { exercise: Exercise; onBa
             loop
             playsInline
             disablePictureInPicture
+            style={{ objectPosition: (e.video.ar ?? 1) >= 1 ? `${e.video.pos ?? 50}% 50%` : `50% ${e.video.pos ?? 50}%` }}
           />
         </div>
       )}
