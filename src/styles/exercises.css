@@ -163,10 +163,12 @@
 }
 
 /* карточка: светлая «студия» под белый фон видео Vital */
-/* карточка: видео в своих пропорциях; высокое — не выше 62% экрана, по центру */
+/* карточка: квадрат на всю ширину, кадр обрезан по длинной стороне вокруг человека (video.pos), как плитка */
 .ex__studio {
   position: relative;
   margin: 0 auto;
+  width: 100%;
+  aspect-ratio: 1;
   border-radius: var(--radius-card);
   overflow: hidden;
   background: #ffffff;
@@ -181,7 +183,7 @@
   display: block;
   width: 102%;
   height: 102%;
-  object-fit: fill;
+  object-fit: cover;
 }
 
 .ex__card-title {

@@ -303,7 +303,8 @@
 }
 .wo-studio {
   margin: 0 auto;
-  height: 13.75rem; /* 220px при ширине 390 — видео видно, таблица подходов целиком на экране */
+  width: 16.25rem; /* 260px при ширине 390: квадрат, обрезка вокруг человека */
+  aspect-ratio: 1;
   max-width: 100%;
   border-radius: var(--radius-card);
   overflow: hidden;
