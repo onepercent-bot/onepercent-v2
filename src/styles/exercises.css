@@ -306,3 +306,110 @@
   border: 1px solid rgba(175, 210, 245, 0.45);
   background: linear-gradient(90deg, #3d5870 0%, #2c4153 50%, #3d5870 100%);
 }
+
+/* экран упражнения: всё на одном экране — параметры, сворачиваемые «Техника» и «Мышцы», прошлый раз */
+.ex__params {
+  margin-top: 0.75rem;
+  padding: 0.6rem 0.9375rem 0.7rem;
+}
+.ex__acc-title {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.ex__params-row {
+  margin-top: 0.45rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.6875rem;
+  color: var(--text-2);
+}
+.ex__params-row span {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.ex__params-row b {
+  color: var(--text);
+  font-weight: 600;
+}
+.ex__params-row svg {
+  width: 0.8125rem;
+  height: 0.8125rem;
+  color: var(--accent);
+  flex: none;
+}
+.ex__acc {
+  margin-top: 0.5rem;
+  padding: 0;
+  overflow: hidden;
+}
+.ex__acc-head {
+  width: 100%;
+  min-height: 2.6rem;
+  padding: 0 0.9375rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: left;
+  color: inherit;
+}
+.ex__acc-head svg {
+  width: 0.9rem;
+  height: 0.9rem;
+  color: var(--accent);
+  transition: transform 240ms var(--ease-out);
+}
+.ex__acc-head svg.is-open {
+  transform: rotate(180deg);
+}
+.ex__acc-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 240ms var(--ease-out);
+}
+.ex__acc-body.is-open {
+  grid-template-rows: 1fr;
+}
+.ex__acc-body > div {
+  min-height: 0;
+  overflow: hidden;
+}
+.ex__acc-body .ex__mus {
+  margin-top: 0;
+  padding: 0 0.9375rem 0.5rem;
+}
+.ex__steps-list {
+  margin: 0;
+  padding: 0 0.9375rem 0.5rem;
+  list-style: none;
+}
+.ex__steps-list li {
+  display: flex;
+  gap: 0.625rem;
+  padding: 0.55rem 0;
+  border-top: 1px solid rgba(150, 190, 255, 0.08);
+  font-size: 0.8125rem;
+  line-height: 1.15rem;
+  color: var(--text);
+}
+.ex__steps-list li:first-child {
+  border-top: 0;
+}
+.ex__prev {
+  margin-top: 0.5rem;
+  padding: 0.6rem 0.9375rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.ex__prev-k {
+  font-size: 0.625rem;
+  color: var(--text-2);
+}
+.ex__prev-v {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
