@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { ChevronLeftIcon, ChevronRightIcon } from '../components/Icons'
+import { useEffect, useMemo, useState } from 'react'
+import { BarsIcon, ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, ClockIcon, PulseIcon } from '../components/Icons'
 import { MuscleIcon, type MuscleZone } from '../components/MuscleIcon'
 import {
   byGroup,
@@ -15,6 +15,8 @@ import {
   type Group,
   type Place,
 } from '../data/exercises'
+import { itemFor } from '../data/plan'
+import { loadProfile } from '../onboarding'
 
 // Раздел «Упражнения»: группа мышц → список → карточка с видео.
 export function Exercises({ initialGroup }: { initialGroup?: string }) {
@@ -166,54 +168,99 @@ const loadRole = ['Основная', 'Помогает']
 
 export function ExerciseCard({ exercise: e, onBack }: { exercise: Exercise; onBack: () => void }) {
   const muscles = musclesOf(e)
+  const profile = useMemo(loadProfile, [])
+  const item = useMemo(() => (profile ? itemFor(e, [], profile, false) : null), [e, profile])
+  const [open, setOpen] = useState<'tech' | 'mus' | null>(null)
+  const ar = e.video?.ar ?? 1
+  const toggle = (k: 'tech' | 'mus') => setOpen((o) => (o === k ? null : k))
+
   return (
     <main className="ex">
       <header className="ex__bar">
         <Back onBack={onBack} />
       </header>
       {e.video && (
-        <div className="ex__studio">
-          <video
-            key={e.id}
-            src={videoUrl(e)}
-            poster={posterUrl(e)}
-            autoPlay
-            muted
-            loop
-            playsInline
-            disablePictureInPicture
-            style={{ objectPosition: (e.video.ar ?? 1) >= 1 ? `${e.video.pos ?? 50}% 50%` : `50% ${e.video.pos ?? 50}%` }}
-          />
+        <div className="ex__studio" style={{ aspectRatio: ar, width: `min(100%, calc(44vh * ${ar}))` }}>
+          <video key={e.id} src={videoUrl(e)} poster={posterUrl(e)} autoPlay muted loop playsInline disablePictureInPicture />
         </div>
       )}
       <h1 className="ex__card-title">{e.name}</h1>
       <p className="ex__card-meta">
         {kindName(e.kind)} · {equipmentOf(e)} · {levelName(e.difficulty)}
       </p>
-      <section className="card ex__mus" aria-label="Работающие мышцы">
-        {muscles.map((m, i) => (
-          <div key={m} className={`ex__mus-row${i === 0 ? ' is-main' : ''}`}>
-            <span className="ex__mus-name">{m}</span>
-            <span className="ex__mus-bar" aria-hidden>
-              {[0, 1].map((k) => (
-                <i key={k} className={k < 2 - i ? 'on' : undefined} />
-              ))}
+
+      {item && (
+        <section className="card ex__params" aria-label="Параметры тренировки">
+          <h2 className="ex__acc-title">Параметры тренировки</h2>
+          <div className="ex__params-row">
+            <span>
+              <BarsIcon />
+              <b>{item.rx.sets}</b> подхода
             </span>
-            <span className="ex__mus-role">{loadRole[i]}</span>
+            <span>
+              <PulseIcon />
+              <b>
+                {item.rx.min}–{item.rx.max}
+              </b>{' '}
+              повторений
+            </span>
+            <span>
+              <ClockIcon />
+              <b>{item.rest} сек</b> отдых
+            </span>
           </div>
-        ))}
+        </section>
+      )}
+
+      <section className="card ex__acc">
+        <button type="button" className="ex__acc-head tappable" aria-expanded={open === 'tech'} onClick={() => toggle('tech')}>
+          <span className="ex__acc-title">Техника</span>
+          <ChevronDownIcon className={open === 'tech' ? 'is-open' : undefined} />
+        </button>
+        <div className={`ex__acc-body${open === 'tech' ? ' is-open' : ''}`}>
+          <div>
+            <ol className="ex__steps-list">
+              {e.steps.map((s, i) => (
+                <li key={i}>
+                  <span className="ex__num">{i + 1}</span>
+                  <span>{s}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </div>
       </section>
-      <section className="card ex__steps" aria-label="Техника">
-        <h2 className="ex__steps-title">Техника</h2>
-        <ol>
-          {e.steps.map((s, i) => (
-            <li key={i}>
-              <span className="ex__num">{i + 1}</span>
-              <span>{s}</span>
-            </li>
-          ))}
-        </ol>
+
+      <section className="card ex__acc">
+        <button type="button" className="ex__acc-head tappable" aria-expanded={open === 'mus'} onClick={() => toggle('mus')}>
+          <span className="ex__acc-title">Какие мышцы работают</span>
+          <ChevronDownIcon className={open === 'mus' ? 'is-open' : undefined} />
+        </button>
+        <div className={`ex__acc-body${open === 'mus' ? ' is-open' : ''}`}>
+          <div>
+            <div className="ex__mus">
+              {muscles.map((m, i) => (
+                <div key={m} className={`ex__mus-row${i === 0 ? ' is-main' : ''}`}>
+                  <span className="ex__mus-name">{m}</span>
+                  <span className="ex__mus-bar" aria-hidden>
+                    {[0, 1].map((k) => (
+                      <i key={k} className={k < 2 - i ? 'on' : undefined} />
+                    ))}
+                  </span>
+                  <span className="ex__mus-role">{loadRole[i]}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </section>
+
+      {item && (
+        <section className="card ex__prev">
+          <span className="ex__prev-k">В прошлый раз</span>
+          <b className="ex__prev-v">{item.prev || 'ещё не выполняли'}</b>
+        </section>
+      )}
     </main>
   )
 }
