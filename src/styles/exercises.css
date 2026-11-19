@@ -413,3 +413,30 @@
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
+
+/* экран упражнения: без пустого места сверху, название в строке с «назад», всё в один экран */
+.ex--card {
+  padding-top: 0.6rem;
+}
+/* раскрыт блок — видео уменьшается, чтобы всё осталось на одном экране */
+.ex--card .ex__studio {
+  transition: width 240ms var(--ease-out);
+}
+.ex__bar--card {
+  align-items: center;
+  margin-bottom: 0.6rem;
+}
+.ex__card-head {
+  min-width: 0;
+}
+.ex__bar--card .ex__card-title {
+  margin-top: 0;
+  font-size: 1.0625rem;
+  line-height: 1.3rem;
+}
+.ex__bar--card .ex__card-meta {
+  margin-top: 0.1rem;
+}
+.ex--card .ex__params {
+  margin-top: 0.6rem;
+}

@@ -7,11 +7,10 @@ import {
   PauseIcon,
   PlayIcon,
   SwapIcon,
-  TrendUpIcon,
 } from '../components/Icons'
-import { MuscleIcon, type MuscleZone } from '../components/MuscleIcon'
 import { NumericWheelPicker } from '../components/NumericWheelPicker'
 import { ExerciseCard } from './Exercises'
+import { autoplay } from '../components/autoplay'
 import { loadExercises, posterUrl, videoUrl, type Exercise } from '../data/exercises'
 import { itemFor, todayIndex, weekPlan, type PlanDay, type PlanItem, type WeekPlan } from '../data/plan'
 import { getWorkouts, saveWorkout, subscribeWorkouts, type SetLog } from '../data/workouts'
@@ -32,11 +31,6 @@ const short: Record<string, string> = {
 
 const num = (x: number) => (Number.isInteger(x) ? String(x) : x.toFixed(1).replace('.', ','))
 const kg = (x: number) => `${num(x)} кг`
-const zoneOf = (e: Exercise): MuscleZone =>
-  e.target === 'biceps' ? 'biceps' : e.target === 'triceps' ? 'triceps' : e.target === 'forearms' ? 'forearms'
-  : e.bodyPart === 'chest' ? 'chest' : e.bodyPart === 'back' || e.bodyPart === 'neck' ? 'back'
-  : e.bodyPart === 'shoulders' ? 'shoulders' : e.bodyPart === 'waist' ? 'abs' : e.bodyPart === 'cardio' ? 'cardio' : 'legs'
-
 const useWorkouts = () => useSyncExternalStore(subscribeWorkouts, getWorkouts, getWorkouts)
 
 export function Workout({ onClose }: { onClose: () => void }) {
@@ -199,14 +193,14 @@ function Thumb({ e }: { e: Exercise }) {
 }
 
 /** Видео упражнения: квадрат, кадр обрезан по длинной стороне вокруг человека (как плитка). */
-function Studio({ e }: { e: Exercise }) {
+function Studio({ e, small }: { e: Exercise; small: boolean }) {
   if (!e.video) return null
   const ar = e.video.ar ?? 1
-  const pos = e.video.pos ?? 50
   return (
-    <div className="wo-studio">
+    <div className="wo-studio" style={{ aspectRatio: ar, width: `min(100%, calc(${small ? 13 : 26}vh * ${ar}))` }}>
       <video
         key={e.id}
+        ref={autoplay}
         src={videoUrl(e)}
         poster={posterUrl(e)}
         autoPlay
@@ -214,7 +208,6 @@ function Studio({ e }: { e: Exercise }) {
         loop
         playsInline
         disablePictureInPicture
-        style={{ objectPosition: ar >= 1 ? `${pos}% 50%` : `50% ${pos}%` }}
       />
     </div>
   )
@@ -236,6 +229,7 @@ function Session({ day, profile, deload, onExit, onDone }: {
   const [idx, setIdx] = useState(0)
   const [logs, setLogs] = useState<LogSet[][]>(() => day.items.map(fresh))
   const [picking, setPicking] = useState<Picking>(null)
+  const [how, setHow] = useState(false)
   const [finished, setFinished] = useState(false)
   const rest = useRest()
 
@@ -328,7 +322,7 @@ function Session({ day, profile, deload, onExit, onDone }: {
       </header>
 
       <div className="wo-body wo-body--s">
-        <Studio e={it.exercise} />
+        <Studio e={it.exercise} small={how} />
         <div className="wo-tline">
           <div>
             <h1 className="wo-tl">{it.exercise.name}</h1>
@@ -336,21 +330,33 @@ function Session({ day, profile, deload, onExit, onDone }: {
               {it.rx.sets} × {it.rx.min}–{it.rx.max} повторений
             </p>
           </div>
-          <MuscleIcon zone={zoneOf(it.exercise)} className="wo-mus" />
+          <button type="button" className={`wo-tech tappable${how ? ' is-on' : ''}`} aria-expanded={how} onClick={() => setHow((v) => !v)}>
+            Техника
+          </button>
         </div>
 
-        <div className="card wo-prog">
-          <span className="wo-disc"><TrendUpIcon /></span>
+        {how && (
+          <ol className="card wo-steps">
+            {it.exercise.steps.map((st, i) => (
+              <li key={i}>
+                <i>{i + 1}</i>
+                <span>{st}</span>
+              </li>
+            ))}
+          </ol>
+        )}
+
+        <p className="wo-tip">
           {prev ? (
-            <p>
+            <>
               Было <b>{prev}</b> · сегодня <b>{it.kg !== null ? kg(it.kg) : it.bodyweight ? 'свой вес' : 'подбор'}</b> {it.change && <em>{it.change}</em>}
-            </p>
+            </>
+          ) : it.bodyweight ? (
+            'Чисто, без рывков — последние 1–2 повтора должны даваться тяжело'
           ) : (
-            <p>
-              {it.bodyweight ? <><b>Свой вес</b> — чисто, без рывков</> : <><b>Подберите вес</b> — последние 1–2 повтора тяжело</>}
-            </p>
+            'Последние 1–2 повтора должны даваться тяжело'
           )}
-        </div>
+        </p>
 
         <div className="card wo-sets">
           <div className="wo-sh">
@@ -390,16 +396,18 @@ function Session({ day, profile, deload, onExit, onDone }: {
           })}
         </div>
 
+        {sets.every((x) => !x.done) && <p className="wo-hint">Нажмите на вес или повторы, чтобы изменить. Сделали подход — нажмите ✓.</p>}
+
         {rest.left > 0 && (
           <div className="card wo-rest">
-            <svg className="wo-ring" viewBox="0 0 48 48" aria-hidden>
-              <circle cx="24" cy="24" r="20" className="wo-ring__bg" />
-              <circle cx="24" cy="24" r="20" className="wo-ring__fg" strokeDasharray="125.7" strokeDashoffset={125.7 * (1 - rest.left / rest.total)} transform="rotate(-90 24 24)" />
-            </svg>
             <span className="wo-rest__t">
-              <b>Отдых</b>
-              <span>
-                {clock(rest.left)} <small>/ {clock(rest.total)}</small>
+              <span className="wo-rest__row">
+                <b>Отдых</b>
+                <span>{clock(rest.left)}</span>
+                <small>/ {clock(rest.total)}</small>
+              </span>
+              <span className="wo-rbar" aria-hidden>
+                <i style={{ width: `${(100 * rest.left) / rest.total}%` }} />
               </span>
             </span>
             <button type="button" className="wo-sq tappable" aria-label={rest.paused ? 'Продолжить' : 'Пауза'} onClick={rest.toggle}>
