@@ -303,9 +303,8 @@
 }
 .wo-studio {
   margin: 0 auto;
-  width: 16.25rem; /* 260px при ширине 390: квадрат, обрезка вокруг человека */
-  aspect-ratio: 1;
-  max-width: 100%;
+  max-width: 100%; /* кадр целиком, высота ≤ 26% экрана (≤ 13% при раскрытой технике) */
+  transition: width 240ms var(--ease-out);
   border-radius: var(--radius-card);
   overflow: hidden;
   background: #fff;
@@ -483,24 +482,6 @@
   gap: 0.8rem;
   padding: 0.65rem 0.75rem 0.65rem 0.8rem;
 }
-.wo-ring {
-  flex: none;
-  width: 2.9rem;
-  height: 2.9rem;
-}
-.wo-ring circle {
-  fill: none;
-  stroke-width: 4;
-}
-.wo-ring__bg {
-  stroke: rgba(140, 196, 251, 0.14);
-}
-.wo-ring__fg {
-  stroke: var(--accent);
-  stroke-linecap: round;
-  transition: stroke-dashoffset 1s linear;
-  filter: drop-shadow(0 0 3px rgba(140, 196, 251, 0.6));
-}
 .wo-rest__t {
   flex: 1;
   display: flex;
@@ -559,7 +540,120 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .wo-ring__fg {
+  .wo-rbar i {
     transition: none;
   }
+}
+
+/* экран подхода: всё в один экран — техника раскрывается, подсказка к таблице */
+.wo-body--s .wo-tline {
+  margin-top: 0.55rem;
+}
+.wo-body--s .wo-tl {
+  font-size: 1.0625rem;
+  line-height: 1.3rem;
+}
+.wo-how {
+  margin-top: 0.5rem;
+}
+.wo-body--s .wo-prog {
+  margin-top: 0.45rem;
+}
+.wo-hint {
+  margin-top: 0.4rem;
+  font-size: 0.6875rem;
+  line-height: 0.95rem;
+  color: var(--text-3);
+  text-align: center;
+}
+
+/* экран подхода по макету владельца: «Техника» у названия, подсказка строкой, таймер полоской */
+.wo-tech {
+  flex: none;
+  height: 2rem;
+  padding: 0 0.95rem;
+  border-radius: 62rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text);
+  border: 1px solid rgba(140, 196, 251, 0.45);
+  background: var(--surface);
+  box-shadow: 0 0 0.6rem rgba(90, 150, 220, 0.18);
+}
+.wo-tech.is-on {
+  border-color: var(--accent);
+  background: linear-gradient(180deg, rgba(22, 34, 46, 0.92), rgba(8, 15, 23, 0.92));
+}
+.wo-steps {
+  margin: 0.5rem 0 0;
+  padding: 0.55rem 0.8rem;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.wo-steps li {
+  display: flex;
+  gap: 0.55rem;
+  font-size: 0.75rem;
+  line-height: 1.05rem;
+  color: var(--text);
+}
+.wo-steps i {
+  flex: none;
+  width: 1.05rem;
+  height: 1.05rem;
+  margin-top: 0.02rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-style: normal;
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: #06121c;
+  background: var(--accent);
+}
+.wo-tip {
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 62rem;
+  background: var(--surface);
+  text-align: center;
+  font-size: 0.72rem;
+  line-height: 1rem;
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+}
+.wo-tip b {
+  color: var(--text);
+  font-weight: 600;
+}
+.wo-tip em {
+  font-style: normal;
+  font-weight: 600;
+  color: var(--accent);
+}
+.wo-rest__row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+.wo-rest__row b {
+  font-size: 0.72rem;
+}
+.wo-rbar {
+  margin-top: 0.4rem;
+  height: 0.28rem;
+  border-radius: 1rem;
+  background: rgba(140, 196, 251, 0.14);
+  overflow: hidden;
+}
+.wo-rbar i {
+  display: block;
+  height: 100%;
+  border-radius: 1rem;
+  background: var(--accent);
+  box-shadow: 0 0 6px rgba(140, 196, 251, 0.6);
+  transition: width 1s linear;
 }

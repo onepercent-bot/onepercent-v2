@@ -15,6 +15,7 @@ import {
   type Group,
   type Place,
 } from '../data/exercises'
+import { autoplay } from '../components/autoplay'
 import { itemFor } from '../data/plan'
 import { loadProfile } from '../onboarding'
 
@@ -175,19 +176,21 @@ export function ExerciseCard({ exercise: e, onBack }: { exercise: Exercise; onBa
   const toggle = (k: 'tech' | 'mus') => setOpen((o) => (o === k ? null : k))
 
   return (
-    <main className="ex">
-      <header className="ex__bar">
+    <main className="ex ex--card">
+      <header className="ex__bar ex__bar--card">
         <Back onBack={onBack} />
+        <div className="ex__card-head">
+          <h1 className="ex__card-title">{e.name}</h1>
+          <p className="ex__card-meta">
+            {kindName(e.kind)} · {equipmentOf(e)} · {levelName(e.difficulty)}
+          </p>
+        </div>
       </header>
       {e.video && (
-        <div className="ex__studio" style={{ aspectRatio: ar, width: `min(100%, calc(44vh * ${ar}))` }}>
-          <video key={e.id} src={videoUrl(e)} poster={posterUrl(e)} autoPlay muted loop playsInline disablePictureInPicture />
+        <div className="ex__studio" style={{ aspectRatio: ar, width: `min(100%, calc(${open ? 17 : 42}vh * ${ar}))` }}>
+          <video key={e.id} ref={autoplay} src={videoUrl(e)} poster={posterUrl(e)} autoPlay muted loop playsInline disablePictureInPicture />
         </div>
       )}
-      <h1 className="ex__card-title">{e.name}</h1>
-      <p className="ex__card-meta">
-        {kindName(e.kind)} · {equipmentOf(e)} · {levelName(e.difficulty)}
-      </p>
 
       {item && (
         <section className="card ex__params" aria-label="Параметры тренировки">
