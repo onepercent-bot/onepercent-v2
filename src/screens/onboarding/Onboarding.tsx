@@ -284,9 +284,13 @@ function StepLevel({ p, set }: StepProps) {
           </button>
         ))}
       </div>
+      <button type="button" className="ob-unsure tappable" onClick={() => set('level', 'beginner')}>
+        Не знаю — начнём как новичок
+      </button>
 
       <section className="card ob-weights">
         <h2 className="ob-weights__title">Твои рабочие веса</h2>
+        <p className="ob-weights__hint">Не знаешь — оставь пустым, подберём на первой тренировке</p>
         {lifts.map((l) => {
           const v = p.workingWeights[l.id]
           return (
