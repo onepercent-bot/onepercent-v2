@@ -647,6 +647,23 @@
   font-weight: 600;
   color: var(--text);
 }
+.ob-weights__hint {
+  padding: 0 calc(var(--u) * 6);
+  font-size: calc(var(--u) * 12.5);
+  line-height: calc(var(--u) * 17);
+  color: var(--text-2);
+}
+.ob-skip {
+  display: block;
+  margin: 0 auto calc(var(--u) * 10);
+  padding: calc(var(--u) * 6) calc(var(--u) * 10);
+  font-size: calc(var(--u) * 13);
+  line-height: calc(var(--u) * 18);
+  color: var(--text-2);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  text-decoration-color: rgba(236, 241, 247, 0.35);
+}
 .ob-weight {
   width: 100%;
   margin-top: calc(var(--u) * 8);

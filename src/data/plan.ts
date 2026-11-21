@@ -2,7 +2,7 @@
 // Состав тренировки: число упражнений по времени и уровню, из них ~60 % базовых; базовые всегда идут первыми,
 // изолирующие — добивка. Вес: первая тренировка — «подбор» на нижний край диапазона, дальше по истории:
 // все подходы на верх диапазона → прибавка, иначе тот же вес и добор повторов. 4-я неделя блока — облегчённая.
-import { myExercises, placesOf, type Exercise } from './exercises'
+import { isBackupModel, myExercises, placesOf, type Exercise } from './exercises'
 import { getWorkouts, type ExerciseLog, type Workout } from './workouts'
 import type { Level, Profile } from '../onboarding'
 
@@ -109,6 +109,7 @@ function score(e: Exercise, p: Profile): number {
   let s = 0
   if (STAPLE.test(n)) s += 50
   if (EXOTIC.test(n)) s -= 30
+  if (isBackupModel(e)) s -= 25
   if (p.place === 'gym' && e.equipment === 'body weight' && !/pull.?up|chin.?up|dip|hanging|crunch|plank/.test(n)) s -= 15
   if (p.place === 'gym' && /band/.test(e.equipment)) s -= 15
   if (/knee push|incline push/.test(n) && p.level !== 'beginner') s -= 40
