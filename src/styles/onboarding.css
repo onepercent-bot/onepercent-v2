@@ -653,9 +653,9 @@
   line-height: calc(var(--u) * 17);
   color: var(--text-2);
 }
-.ob-unsure {
+.ob-skip {
   display: block;
-  margin: calc(var(--u) * 10) auto 0;
+  margin: 0 auto calc(var(--u) * 10);
   padding: calc(var(--u) * 6) calc(var(--u) * 10);
   font-size: calc(var(--u) * 13);
   line-height: calc(var(--u) * 18);

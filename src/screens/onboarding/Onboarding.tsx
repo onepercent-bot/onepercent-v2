@@ -131,6 +131,18 @@ export function Onboarding({ onExit, onDone }: Props) {
             {p.perWeek} {pluralTimes(p.perWeek)} в неделю по {p.minutes} минут
           </p>
         )}
+        {step === 3 && p.level === null && (
+          <button
+            type="button"
+            className="ob-skip tappable"
+            onClick={() => {
+              set('level', 'beginner')
+              setStep(4)
+            }}
+          >
+            Не знаю — пропустить, начнём как новичок
+          </button>
+        )}
         <button type="button" className="ob__cta tappable" disabled={!valid[step]} onClick={next}>
           Далее
           <ArrowRightIcon />
@@ -284,9 +296,6 @@ function StepLevel({ p, set }: StepProps) {
           </button>
         ))}
       </div>
-      <button type="button" className="ob-unsure tappable" onClick={() => set('level', 'beginner')}>
-        Не знаю — начнём как новичок
-      </button>
 
       <section className="card ob-weights">
         <h2 className="ob-weights__title">Твои рабочие веса</h2>
