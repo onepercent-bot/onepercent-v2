@@ -133,10 +133,20 @@ export const groups: Group[] = [
   { id: 'cardio', name: 'Кардио', parts: ['cardio'] },
 ]
 
+// Основной персонаж — серый манекен (мужчины) и женский манекен с мышцами; запасной — манекен в красной майке
+// (0101–0300) и живая девушка в коричневой форме (1243–1342): только там, где у основного такого упражнения нет
+// (решение владельца 2026-11-21). Дубли между ними удалены из данных; запасные идут в списке и в плане после основных.
+export const isBackupModel = (e: Exercise) => {
+  const n = Number(e.id)
+  return e.model === 'male' ? n >= 101 && n <= 300 : e.model === 'female' ? n >= 1243 && n <= 1342 : false
+}
+
 export const byGroup = (g: Group, place?: Place) =>
-  data.exercises.filter(
-    (e) => (!g.parts.length || g.parts.includes(e.bodyPart)) && (!g.match || g.match(e)) && (!place || placesOf(e).includes(place)) && forMe(e),
-  )
+  data.exercises
+    .filter(
+      (e) => (!g.parts.length || g.parts.includes(e.bodyPart)) && (!g.match || g.match(e)) && (!place || placesOf(e).includes(place)) && forMe(e),
+    )
+    .sort((a, b) => Number(isBackupModel(a)) - Number(isBackupModel(b)))
 
 /** Все упражнения с персонажем своего пола. */
 export const myExercises = () => data.exercises.filter(forMe)
