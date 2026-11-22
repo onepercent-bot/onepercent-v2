@@ -125,9 +125,11 @@ function BodyMap({ report }: { report: ProgressReport }) {
     const a = base.side === side ? base : { ...base, side, x: cx + (cx - base.x) * 0.82 }
     shown.push({ group: g.group, change: g.change, a })
   }
-  const insufficient = report.sessions > 0 && !shown.length
+  // плашка на персонаже — только если график уже есть; иначе это объясняет карточка «Рост силы» (торс не закрываем)
+  const insufficient = report.sessions > 0 && !shown.length && report.chart.length >= 2
   return (
-    <section className="pg-hero" aria-label="Прогресс по группам мышц">
+    <section className={`pg-hero${shown.length ? ' has-marks' : ''}`} aria-label="Прогресс по группам мышц">
+      <div className="pg-hero__frame">
       <img className="pg-hero__art" src={hero.src} alt="" width={hero.w} height={hero.h} draggable={false} />
       <svg className="pg-hero__lines" viewBox={`0 0 ${hero.w} ${hero.h}`} aria-hidden>
         {shown.map(({ group, a }) => {
@@ -152,11 +154,9 @@ function BodyMap({ report }: { report: ProgressReport }) {
           </div>
         )
       })}
+      </div>
       {insufficient && (
-        <p className="pg-hero__empty">
-          Недостаточно данных
-          <span>Проценты по мышцам появятся, когда упражнение повторится хотя бы дважды</span>
-        </p>
+        <p className="pg-hero__empty">Проценты по мышцам появятся после повтора упражнения</p>
       )}
     </section>
   )
@@ -177,9 +177,7 @@ function StrengthCard({ report }: { report: ProgressReport }) {
       {has ? (
         <Chart report={report} />
       ) : (
-        <p className="pg-str__empty">
-          График строится по рабочим весам и повторениям. Нужны хотя бы две тренировки с одинаковыми упражнениями за этот период.
-        </p>
+        <p className="pg-str__empty">График и проценты по мышцам появятся, когда упражнение повторится хотя бы дважды.</p>
       )}
     </section>
   )
